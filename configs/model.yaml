@@ -1,0 +1,26 @@
+# configs/model.yaml —— 声明式配置，不含任何密钥
+provider: deepseek
+base_url: https://api.deepseek.com
+model_id: deepseek-flash
+allowed_models: [deepseek-flash, deepseek-v4-pro]
+params:
+  temperature: 0
+  top_p: 1
+  # deepseek-flash 默认开启深度思考，reasoning 与正文共享此预算。
+  # 已用 thinking=disabled 关闭推理，此值作为正文上限保留。
+  max_tokens: 8000
+  stream: false
+# 深度思考开关（非 OpenAI 标准字段，走 extra_body；参与缓存键）
+# disabled 实测比 enabled 省 33 倍 token，且消除"正文为空"的失败
+thinking:
+  type: disabled
+batch:
+  # 批大小受"输出预算"约束而非输入上限：见 src/pipeline._match_claim_batched
+  # match_claim 失败时会自适应二分，此处为起始批大小
+  match_item: 40
+  match_claim: 20
+budget:
+  max_calls_per_run: 60
+  max_input_chars: 4000
+  max_output_tokens: 8000
+  concurrency: 2

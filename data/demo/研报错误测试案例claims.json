@@ -1,0 +1,76 @@
+{
+  "claims": [
+    {
+      "claim_id": "fixture_2024_unit_np",
+      "page": 1,
+      "planted_error": "UNIT_SCALE",
+      "sentence": "2024年归母净利润为862.3亿万元，同比增长15.38%。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_2025_unit_revenue",
+      "page": 1,
+      "planted_error": "UNIT_SCALE",
+      "sentence": "2025年营业总收入为1721千万元，同比下降1.2%。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_period_2024_value_as_2025",
+      "page": 1,
+      "planted_error": "PERIOD_MISMATCH",
+      "sentence": "2025年营业总收入为1741.4亿元。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_period_2025_value_as_2024",
+      "page": 1,
+      "planted_error": "PERIOD_MISMATCH",
+      "sentence": "2024年归母净利润为823.2亿元。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_scope_moutai_as_company_2024",
+      "page": 1,
+      "planted_error": "SCOPE_MIXED",
+      "sentence": "2024年公司营业总收入为1459.3亿元。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_scope_series_as_company_2025",
+      "page": 1,
+      "planted_error": "SCOPE_MIXED",
+      "sentence": "2025年公司营业总收入为222.7亿元。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_value_moutai_2024",
+      "page": 1,
+      "planted_error": "VALUE_ERROR",
+      "sentence": "茅台酒2024年营业收入为1495.3亿元。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_value_series_2025",
+      "page": 1,
+      "planted_error": "VALUE_ERROR",
+      "sentence": "系列酒2025年营业收入为232亿元。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_sign_revenue_yoy_2025",
+      "page": 1,
+      "planted_error": "SIGN_ERROR",
+      "sentence": "2025年营业总收入同比增长1.2%。",
+      "source": "模拟研报_植错测试样例.md"
+    },
+    {
+      "claim_id": "fixture_sign_forecast_delta_2026",
+      "page": 1,
+      "planted_error": "SIGN_ERROR",
+      "sentence": "2026E归母净利润预测较原预测上调5.4%。",
+      "source": "模拟研报_植错测试样例.md"
+    }
+  ],
+  "fixture_id": "fincheck_error_cases_v1",
+  "notice": "本材料为竞赛模拟样例，非任何机构发布的研究报告。每条均为人工植入错误，仅用于回归测试。"
+}

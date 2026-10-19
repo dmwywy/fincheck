@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "canonical_item": "TOTAL_REVENUE",
+      "confidence": 0.95,
+      "raw_header": "营业总收入"
+    },
+    {
+      "canonical_item": "REVENUE",
+      "confidence": 0.9,
+      "raw_header": "营业收入"
+    },
+    {
+      "canonical_item": "",
+      "confidence": 0.2,
+      "raw_header": "其中：主营业务收入"
+    }
+  ]
+}

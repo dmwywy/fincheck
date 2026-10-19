@@ -1,0 +1,28 @@
+# configs/demo.yaml —— 初赛最小验证范围
+run:
+  company: 贵州茅台
+  materials:
+    # ★ 仓库内路径（相对项目根目录），已提交，clone 即可用。
+    #   研报 claim 文件：由 tools/extract_claims.py 从模拟研报生成
+    report_claims: data/demo/研报claims_2024.json
+
+    # ★ 以下为**原始材料**，只有"重新解析"时才需要，不入库：
+    #   年报 PDF 与模拟研报 docx 属大文件，按 README 协作约定走共享盘，
+    #   且 data/full/ 已在 .gitignore 中。**当前流程不读取这两项**——
+    #   运行时消费的是 data/structured/ 下已解析好的结构化数据（同样已提交）。
+    #   要重新解析，直接用工具参数传你自己的本地路径：
+    #     python tools/extract_fields.py --pdf "<你的路径>/2024年年度报告.pdf" ^
+    #            --year 2024 --out 贵州茅台_2024
+    #     python tools/extract_claims.py --docx "<你的路径>/模拟研究报告.docx" ^
+    #            --tag 2024 --out 研报claims_2024
+    # annual_2024: "<你的本地路径>"
+    # annual_2025: "<你的本地路径>"
+  user: member_e
+  offline: false
+paths:
+  fields: rules/fields.yaml
+  rules: rules/rules.yaml
+  tolerance: rules/tolerance.yaml
+  runs: runs
+outputs:
+  formats: [xlsx, html, pdf]

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "fincheck": {
+      "command": "python",
+      "args": ["-m", "mcp_server"],
+      "cwd": ".",
+      "description": "财报一致性量化核查智能体 · stdio MCP 服务（工具：fincheck_ingest / fincheck_run / fincheck_report / calculate_ratios / check_consistency）"
+    }
+  }
+}

@@ -1,0 +1,891 @@
+[
+  {
+    "claim_id": "r2024_p02_001",
+    "figures": [
+      "9%"
+    ],
+    "kind": "TEXT",
+    "page": 0,
+    "para": 2,
+    "para_no": null,
+    "section": "",
+    "sentence": "2024 年稳健收官，2025 年目标收入增长9%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p04_002",
+    "figures": [
+      "1741.4 亿元",
+      "15.66%",
+      "15.38%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "2024 年公司实现营业总收入 1741.4 亿元/同比+15.66%，归母净利润 862.3 亿万元/同比+15.38%。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p04_003",
+    "figures": [
+      "510.2亿元",
+      "-12.77%",
+      "254.0亿元",
+      "16.21%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "其中 2024Q4 实现营业总收入510.2亿元/同比-12.77%，归母净利润254.0亿元/同比+16.21%，高于此前预告值。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p04_004",
+    "figures": [
+      "75%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "结合中期分红计算 2024 年度分红率 75%，与分红回报规划一致。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p05_005",
+    "figures": [
+      "1495.3 亿元",
+      "15.28%",
+      "4.6 万吨",
+      "10.22%",
+      "4303 吨",
+      "314.4 万元",
+      "4.59%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "茅台酒 2024 年营收 1495.3 亿元/+15.28%，销量 4.6 万吨/+10.22%（增量 4303 吨），吨价 314.4 万元/+4.59%，主要系普飞提价拉动，增量预计多由公斤装飞天、生肖茅台贡献。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p05_006",
+    "figures": [
+      "0.1pcts"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "茅台酒毛利率同比下降 0.1pcts，主要系人工成本提高所致；",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p05_007",
+    "figures": [
+      "19.73%",
+      "-4.48%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "飞天提价驱动 2024 年批发渠道增长较快（收入同比+19.73%），而经销商增量公斤装又导致直销渠道吨价下降（同比-4.48%）。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p05_008",
+    "figures": [
+      "246.8 亿元",
+      "19.65%",
+      "3.7 万吨",
+      "18.47%",
+      "66.9 万元",
+      "1.00%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "系列酒 2024 年营收 246.8 亿元/+19.65%，销量 3.7 万吨/同比+18.47%，吨价 66.9 万元/+1.00%，预计茅台 1935 稳健增长，王子酒、汉酱等其他单品增速较快。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p05_009",
+    "figures": [
+      "0.7pcts",
+      "0.2pcts",
+      "-1.1pcts"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "费用端看，2024 年税金及附加率/销售费用率/管理费用率同比+0.7pcts/+0.2pcts/-1.1pcts，消费税增加较多系生产节奏扰动，公司精益化管理能力有所提高。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p06_010",
+    "figures": [
+      "448.0 亿元",
+      "13.94%",
+      "52.9 亿元",
+      "5.07%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 6,
+    "para_no": 3,
+    "section": "核心观点",
+    "sentence": "分产品看，2024Q4 茅台酒收入 448.0 亿元/+13.94%，系列酒收入 52.9 亿元/+5.07%，预计主因公司计划外增投公斤装、茅台 1935 进行渠道调整。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p06_011",
+    "figures": [
+      "0.1pcts",
+      "-1.9pcts",
+      "1.5pcts"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 6,
+    "para_no": 3,
+    "section": "核心观点",
+    "sentence": "利润率看，2024Q4 毛利率同比+0.1pcts，销售费用率/管理费用率同比-0.8/-1.9pcts，推动 2024Q4 净利率同比+1.5pcts。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p06_012",
+    "figures": [
+      "95.92 亿元",
+      "3.38亿元"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 6,
+    "para_no": 3,
+    "section": "核心观点",
+    "sentence": "截至 2024 末合同负债 95.92 亿元，环比 Q3 末减少 3.38亿元，预收端略有承压主因部分经销商节奏较快，前三季度完成全年大部分任务。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p06_013",
+    "figures": [
+      "10%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 6,
+    "para_no": 3,
+    "section": "核心观点",
+    "sentence": "2025Q1公司经营节奏稳步推进，普飞批价整体稳定可控，公斤装、茅台 1935 开瓶动销表现良好，我们预计2025Q1收入增长 10%左右。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p07_014",
+    "figures": [
+      "9%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "2024 年收入增长目标 9%左右。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p07_015",
+    "figures": [
+      "9%",
+      "6%",
+      "4.9 万吨"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "我们预计茅台酒收入同比+8~9%，量增同比+6%至4.9 万吨左右，其中 500ml53 度飞天减量并调整投放渠道、以稳定价盘为工作重心；",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p07_016",
+    "figures": [
+      "16%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "系列酒预计增长 16%左右，茅台 1935 销售模式改革、或增量有限；",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p08_017",
+    "figures": [
+      "2236.6 亿元",
+      "9.5%",
+      "8.6%",
+      "8.0%",
+      "8.0%",
+      "7.4%",
+      "1116.8 亿元",
+      "9.3%",
+      "9.0%",
+      "8.7%",
+      "7.9%",
+      "8.5%",
+      "18.9 倍"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 8,
+    "para_no": 5,
+    "section": "核心观点",
+    "sentence": "结合公司经营目标，略上调 2025/2026 年收入及净利润预测并引入 2027 年预测，预计 2025-2027 年公司营业总收入 1907.5/2070.7/2236.6 亿元，同比+9.5%/+8.6%/+8.0%（前值 25/26 年同比+8.0%/+7.4%） ，预计归母净利润942.7/1027.7/1116.8 亿元，同比+9.3%/+9.0%/+8.7%（前值+7.9%/+8.5%），当前股价对应 20.6/18.9 倍25/26 年PE，维持“优于大市”评级。",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p18_018",
+    "figures": [
+      "15%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 18,
+    "para_no": 15,
+    "section": "核心观点",
+    "sentence": "《贵州茅台（600519.SH）-2024 年收入增长约 15%，2025 年经营目标理性务实》 ——2025-01-04",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "claim_id": "r2024_p20_019",
+    "figures": [
+      "15%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 20,
+    "para_no": 17,
+    "section": "核心观点",
+    "sentence": "《贵州茅台（600519.SH）－第三季度茅台酒增速快于整体，全年15%收入增速可期》 ——2024-10-28",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_00",
+    "figures": [
+      "2023",
+      "2024",
+      "2025",
+      "2026",
+      "2027"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 1,
+    "section": "表2",
+    "sentence": "盈利预测和财务指标 | 2023 | 2024 | 2025E | 2026E | 2027E",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_01",
+    "figures": [],
+    "kind": "TABLE_LABEL",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 2,
+    "section": "表2",
+    "sentence": "营业收入（百万元） | 150,560 | 174,144 | 190,754 | 207,065 | 223,663",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_02",
+    "figures": [
+      "18.0%",
+      "15.7%",
+      "9.5%",
+      "8.6%",
+      "8.0%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 3,
+    "section": "表2",
+    "sentence": "(+/-%) | 18.0% | 15.7% | 9.5% | 8.6% | 8.0%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_03",
+    "figures": [],
+    "kind": "TABLE_LABEL",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 4,
+    "section": "表2",
+    "sentence": "净利润（百万元） | 74734 | 86228 | 94268 | 102766 | 111681",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_04",
+    "figures": [
+      "19.2%",
+      "15.4%",
+      "9.3%",
+      "9.0%",
+      "8.7%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 5,
+    "section": "表2",
+    "sentence": "(+/-%) | 19.2% | 15.4% | 9.3% | 9.0% | 8.7%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_05",
+    "figures": [],
+    "kind": "TABLE_LABEL",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 6,
+    "section": "表2",
+    "sentence": "每股收益（元） | 59.49 | 68.64 | 75.04 | 81.81 | 88.90",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_06",
+    "figures": [
+      "67.7%",
+      "67.9%",
+      "66.9%",
+      "66.4%",
+      "66.7%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 7,
+    "section": "表2",
+    "sentence": "EBIT  Marg in | 67.7% | 67.9% | 66.9% | 66.4% | 66.7%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t01_07",
+    "figures": [
+      "34.7%",
+      "37.0%",
+      "36.7%",
+      "36.4%",
+      "36.0%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 8,
+    "section": "表2",
+    "sentence": "净资产收益率（ROE） | 34.7% | 37.0% | 36.7% | 36.4% | 36.0%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_01",
+    "figures": [
+      "2025",
+      "2026",
+      "2025",
+      "2026",
+      "2025",
+      "2026"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 2,
+    "section": "表3",
+    "sentence": " |  | 2025E | 2026E | 2025E | 2026E | 2025E | 2026E",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_02",
+    "figures": [
+      "1.6%",
+      "1.6%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 3,
+    "section": "表3",
+    "sentence": "营业收入（百万元） | 174, 144 | 187,750 | 201,721 | 190,754 | 207,065 | 1.6% | 1.6%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_03",
+    "figures": [
+      "15.66%",
+      "8.03%",
+      "7.44%",
+      "9.54%",
+      "8.55%",
+      "1.51pcts",
+      "1.11pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 4,
+    "section": "表3",
+    "sentence": "收入同比增速% | 15.66% | 8.03% | 7.44% | 9.54% | 8.55% | 1.51pcts | 1.11pcts",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_04",
+    "figures": [
+      "92.08%",
+      "91.50%",
+      "92.00%",
+      "92.14%",
+      "92.12%",
+      "0.64pcts",
+      "0.12pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 5,
+    "section": "表3",
+    "sentence": "毛利率% | 92.08% | 91.50% | 92.00% | 92.14% | 92.12% | 0.64pcts | 0.12pcts",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_05",
+    "figures": [
+      "3.24%",
+      "4.00%",
+      "3.70%",
+      "4.30%",
+      "4.70%",
+      "0.3pcts",
+      "1pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 6,
+    "section": "表3",
+    "sentence": "销售费用率% | 3.24% | 4.00% | 3.70% | 4.30% | 4.70% | 0.3pcts | 1pcts",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_06",
+    "figures": [
+      "2.0%",
+      "2.4%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 7,
+    "section": "表3",
+    "sentence": "归母净利润（百万元） | 86,228 | 92,452 | 100,337 | 94,268 | 102,766 | 2.0% | 2.4%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_07",
+    "figures": [
+      "15.38%",
+      "7.88%",
+      "8.53%",
+      "9.32%",
+      "9.01%",
+      "1.44pcts",
+      "0.48pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 8,
+    "section": "表3",
+    "sentence": "归母净利润同比增速% | 15.38% | 7.88% | 8.53% | 9.32% | 9.01% | 1.44pcts | 0.48pcts",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_08",
+    "figures": [
+      "49.52%",
+      "49.24%",
+      "49.74%",
+      "49.42%",
+      "49.63%",
+      "0.18pcts",
+      "-0.11pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 9,
+    "section": "表3",
+    "sentence": "归母净利率% | 49.52% | 49.24% | 49.74% | 49.42% | 49.63% | 0.18pcts | -0.11pcts",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": "表1：盈利预测调整表",
+    "claim_id": "r2024_t02_09",
+    "figures": [
+      "2.0%",
+      "2.4%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 10,
+    "section": "表3",
+    "sentence": "EPS（元） | 68.64 | 73.60 | 79.87 | 75.04 | 81.81 | 2.0% | 2.4%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t04_00",
+    "figures": [
+      "2023",
+      "2024",
+      "2025",
+      "2026",
+      "2027"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 1,
+    "section": "表5",
+    "sentence": "利润表（百万元） | 2023 | 2024 | 2025E | 2026E | 2027E",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t04_17",
+    "figures": [
+      "2023",
+      "2024",
+      "2025",
+      "2026",
+      "2027"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 18,
+    "section": "表5",
+    "sentence": "现金流量表（百万元） | 2023 | 2024 | 2025E | 2026E | 2027E",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_00",
+    "figures": [
+      "2023",
+      "2024",
+      "2025",
+      "2026",
+      "2027"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 1,
+    "section": "表6",
+    "sentence": "资产负债表（百万元） | 2023 | 2024 | 2025E | 2026E | 2027E",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_23",
+    "figures": [
+      "2023",
+      "2024",
+      "2025",
+      "2026",
+      "2027"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 24,
+    "section": "表6",
+    "sentence": "关键财务与估值指标 | 2023 | 2024 | 2025E | 2026E | 2027E",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_27",
+    "figures": [
+      "76.0%",
+      "77.5%",
+      "77.3%",
+      "74.8%",
+      "77.5%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 28,
+    "section": "表6",
+    "sentence": "ROIC | 76.0% | 77.5% | 77.3% | 74.8% | 77.5%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_28",
+    "figures": [
+      "34.7%",
+      "37.0%",
+      "36.7%",
+      "36.4%",
+      "36.0%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 29,
+    "section": "表6",
+    "sentence": "ROE | 34.7% | 37.0% | 36.7% | 36.4% | 36.0%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_29",
+    "figures": [
+      "92.1%",
+      "92.1%",
+      "92.1%",
+      "92.1%",
+      "92.2%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 30,
+    "section": "表6",
+    "sentence": "毛利率 | 92.1% | 92.1% | 92.1% | 92.1% | 92.2%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_30",
+    "figures": [
+      "67.7%",
+      "67.9%",
+      "66.9%",
+      "66.4%",
+      "66.7%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 31,
+    "section": "表6",
+    "sentence": "EBIT Marg in | 67.7% | 67.9% | 66.9% | 66.4% | 66.7%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_31",
+    "figures": [
+      "68.9%",
+      "69.0%",
+      "68.3%",
+      "67.8%",
+      "68.1%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 32,
+    "section": "表6",
+    "sentence": "EBITDA  Marg in | 68.9% | 69.0% | 68.3% | 67.8% | 68.1%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_32",
+    "figures": [
+      "18.0%",
+      "15.7%",
+      "9.5%",
+      "8.6%",
+      "8.0%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 33,
+    "section": "表6",
+    "sentence": "收入增长 | 18.0% | 15.7% | 9.5% | 8.6% | 8.0%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_33",
+    "figures": [
+      "19.2%",
+      "15.4%",
+      "9.3%",
+      "9.0%",
+      "8.7%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 34,
+    "section": "表6",
+    "sentence": "净利润增长率 | 19.2% | 15.4% | 9.3% | 9.0% | 8.7%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_34",
+    "figures": [
+      "20.9%",
+      "22.0%",
+      "22.2%",
+      "22.2%",
+      "21.8%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 35,
+    "section": "表6",
+    "sentence": "资产负债率 | 20.9% | 22.0% | 22.2% | 22.2% | 21.8%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2024_t05_35",
+    "figures": [
+      "3.0%",
+      "3.6%",
+      "3.6%",
+      "4.0%",
+      "4.3%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 36,
+    "section": "表6",
+    "sentence": "股息率 | 3.0% | 3.6% | 3.6% | 4.0% | 4.3%",
+    "source": "贵州茅台【2024全年】模拟研究报告（用于测.docx",
+    "source_hash": "a54df83c816d2e4aa5edb4fcfd53d671d2f7fd7547f650633b199e3608ce98e9"
+  }
+]

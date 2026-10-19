@@ -1,0 +1,15 @@
+{
+  "task": "match_claim",
+  "claims": [
+    {
+      "claim_id": "demo-001",
+      "sentence": "示例研究报告片段：营业收入引用需与财报字段核对。"
+    }
+  ],
+  "fields": [
+    {
+      "item_code": "REVENUE",
+      "period": "2024"
+    }
+  ]
+}

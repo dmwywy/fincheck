@@ -1,0 +1,92 @@
+{
+  "counts_by_type": {
+    "PERIOD_MISMATCH": 2,
+    "SCOPE_MIXED": 2,
+    "SIGN_ERROR": 2,
+    "UNIT_SCALE": 2,
+    "VALUE_ERROR": 2
+  },
+  "fixture_id": "fincheck_error_cases_v1",
+  "items": [
+    {
+      "bad": "2024年归母净利润为862.3亿万元，同比增长15.38%。",
+      "claim_id": "fixture_2024_unit_np",
+      "correct": "2024年归母净利润为862.3亿元，同比增长15.38%。",
+      "fact": "NP_PARENT 2024 = 86,228,146,421.62 元；报告数字 862.3 正确，单位错。",
+      "source": "2024 年年度报告，合并利润表；金标准 data/gold_standard/贵州茅台_2024_核心字段.json。",
+      "type": "UNIT_SCALE"
+    },
+    {
+      "bad": "2025年营业总收入为1721千万元，同比下降1.2%。",
+      "claim_id": "fixture_2025_unit_revenue",
+      "correct": "2025年营业总收入为1721亿元，同比下降1.2%。",
+      "fact": "TOTAL_REVENUE 2025 = 172,054,171,890.91 元。",
+      "source": "2025 年年度报告，合并利润表；结构化字段 data/structured/贵州茅台_2025.json。",
+      "type": "UNIT_SCALE"
+    },
+    {
+      "bad": "2025年营业总收入为1741.4亿元。",
+      "claim_id": "fixture_period_2024_value_as_2025",
+      "correct": "2024年营业总收入为1741.4亿元。",
+      "fact": "174,144,069,958.25 元属于 2024 FY，不是 2025 FY。",
+      "source": "2024/2025 年年度报告，合并利润表比较列；2024/2025 结构化字段。",
+      "type": "PERIOD_MISMATCH"
+    },
+    {
+      "bad": "2024年归母净利润为823.2亿元。",
+      "claim_id": "fixture_period_2025_value_as_2024",
+      "correct": "2025年归母净利润为823.2亿元。",
+      "fact": "82,320,067,101.68 元属于 2025 FY；2024 FY 为 86,228,146,421.62 元。",
+      "source": "2024/2025 年年度报告，合并利润表；data/structured/贵州茅台_2024.json 与 贵州茅台_2025.json。",
+      "type": "PERIOD_MISMATCH"
+    },
+    {
+      "bad": "2024年公司营业总收入为1459.3亿元。",
+      "claim_id": "fixture_scope_moutai_as_company_2024",
+      "correct": "2024年公司营业总收入为1741.4亿元。",
+      "fact": "145,928,075,955.31 元是茅台酒分产品收入；公司营业总收入为174,144,069,958.25元。",
+      "source": "2024 年年度报告，第三节主营业务分产品情况及合并利润表。",
+      "type": "SCOPE_MIXED"
+    },
+    {
+      "bad": "2025年公司营业总收入为222.7亿元。",
+      "claim_id": "fixture_scope_series_as_company_2025",
+      "correct": "2025年公司营业总收入为1720.5亿元。",
+      "fact": "22,274,678,707.16 元是系列酒分产品收入；公司营业总收入为172,054,171,890.91元。",
+      "source": "2025 年年度报告，第三节主营业务分产品情况及合并利润表。",
+      "type": "SCOPE_MIXED"
+    },
+    {
+      "bad": "茅台酒2024年营业收入为1495.3亿元。",
+      "claim_id": "fixture_value_moutai_2024",
+      "correct": "茅台酒2024年营业收入为1459.3亿元。",
+      "fact": "REVENUE_MOUTAI 2024 = 145,928,075,955.31 元。",
+      "source": "2024 年年度报告，第三节主营业务分产品情况，茅台酒行。",
+      "type": "VALUE_ERROR"
+    },
+    {
+      "bad": "系列酒2025年营业收入为232亿元。",
+      "claim_id": "fixture_value_series_2025",
+      "correct": "系列酒2025年营业收入为222.7亿元。",
+      "fact": "REVENUE_SERIES 2025 = 22,274,678,707.16 元。",
+      "source": "2025 年年度报告，第三节主营业务分产品情况，系列酒行。",
+      "type": "VALUE_ERROR"
+    },
+    {
+      "bad": "2025年营业总收入同比增长1.2%。",
+      "claim_id": "fixture_sign_revenue_yoy_2025",
+      "correct": "2025年营业总收入同比下降1.2%。",
+      "fact": "(172,054,171,890.91 / 174,144,069,958.25 - 1) × 100 = -1.20%（四舍五入）。",
+      "source": "2025 年年度报告，合并利润表 2025/2024 比较数；data/structured/贵州茅台_2025.json。",
+      "type": "SIGN_ERROR"
+    },
+    {
+      "bad": "2026E归母净利润预测较原预测上调5.4%。",
+      "claim_id": "fixture_sign_forecast_delta_2026",
+      "correct": "2026E归母净利润预测较原预测下调5.4%。",
+      "fact": "(84,658 / 89,512 - 1) × 100 = -5.42%，按一位小数为 -5.4%。",
+      "source": "2025 模拟研报表1盈利预测调整表：2026E 原预测89,512、新预测84,658（单位百万元）。",
+      "type": "SIGN_ERROR"
+    }
+  ]
+}

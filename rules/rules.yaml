@@ -1,0 +1,364 @@
+# rules/rules.yaml
+# 维度与权重以《CSI说明》为准（表内 / 表间 / 跨期间 / 主表与附注 / 研报引用）
+#
+# v1.1：11 条 → 27 条（+ C研 的 RC01，见 src/research_check.py）。
+#       新增数据源：分部数据（第三节）、所有者权益变动表、现金流量表补充资料明细、
+#       应收账款坏账计提附注。字段见 rules/fields.yaml v1.1。
+#
+# 每条规则的三种取值方式（kind）：
+#   缺省        —— 在同一 (period, period_type) 内取数，要求所有字段期间一致
+#   cross_period—— 同一时点的期末数 vs 下一年报的期初数（用 item 指定科目）
+#   report_year —— 按**报告年度**对齐取数：期末/期初/时期数合成一期后再代入表达式
+version: "1.1"
+
+# ===== 集中口径开关（provisional，待业务负责人正式裁定）=====
+# 本段是【CSI 维度命名 + 权重 + 有效规则集】的唯一来源；改这里再重跑即可切换口径，
+# 无需改动其它代码。容差档位的唯一来源仍是 rules/tolerance.yaml（本段不复制其数值）。
+# 四项争议的对比、推荐默认值、运行影响与裁定责任人见过程材料中的 决策口径对比_provisional.md（不在本源码仓内）。
+scoring:
+  profile: default-provisional   # 生效口径名，随 csi.json 一起落盘（注明来源）
+  provisional: true              # 尚未获业务裁定，统一标注 provisional
+  # CSI 维度（命名不得改动：C内/C间/C期/C附/C研）与权重
+  dimensions:
+    C内: {name: 表内一致性,       weight: 0.25}
+    C间: {name: 表间一致性,       weight: 0.30}
+    C期: {name: 跨期间一致性,     weight: 0.15}
+    C附: {name: 主表与附注一致性, weight: 0.20}
+    C研: {name: 研报引用一致性,   weight: 0.10}
+  # 有效规则集：null = 执行下方 rules 全部（当前 27 条）；给出 rule_id 列表则只执行列出的规则。
+  # 注：C研 的 RC01 在 src/research_check.py，不在此列表内，始终计入 CSI。
+  active_rule_ids: null
+
+rules:
+  - rule_id: BS01
+    dimension: C内
+    expr: "TOTAL_ASSETS - (TOTAL_LIAB + TOTAL_EQUITY)"
+    requires: [TOTAL_ASSETS, TOTAL_LIAB, TOTAL_EQUITY]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    source: "年报-第十节-合并资产负债表"
+
+  - rule_id: BS02
+    dimension: C内
+    expr: "TOTAL_EQUITY - (EQUITY_PARENT + EQUITY_MINORITY)"
+    requires: [TOTAL_EQUITY, EQUITY_PARENT, EQUITY_MINORITY]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    source: "年报-第十节-合并资产负债表"
+
+  - rule_id: IS03
+    dimension: C内
+    expr: "NET_PROFIT - (TOTAL_PROFIT - INCOME_TAX)"
+    requires: [NET_PROFIT, TOTAL_PROFIT, INCOME_TAX]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    source: "年报-第十节-合并利润表"
+
+  - rule_id: CF01
+    dimension: C内
+    # 完整式：现金及现金等价物净增加额 = 经营 + 投资 + 筹资 + 汇率变动影响
+    # 此前只写 CF_OPERATING 一项，等式本就不该成立，必然误报；
+    # 补齐 CF_INVESTING / CF_FINANCING / CF_FX_EFFECT 三个字段后改为完整式。
+    expr: "CF_NET_INCREASE - (CF_OPERATING + CF_INVESTING + CF_FINANCING + CF_FX_EFFECT)"
+    requires: [CF_NET_INCREASE, CF_OPERATING, CF_INVESTING, CF_FINANCING, CF_FX_EFFECT]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "现金流量表披露了投资/筹资/汇率变动三项"
+    source: "年报-第十节-合并现金流量表"
+
+  # ---- 分部数据表内加总（规则表 11/12 条）----
+  # ★ 只做**分部表内部**的加总核对，不拿去比利润表营业收入：
+  #   分部小计 170,611,838,052.02 vs 营业收入 170,899,152,276.34 差 287,314,224.32，
+  #   差额是其他业务收入，分部表未单独披露该行，直接比必然误报。
+  #   同一个分部小计有三组互相独立的分解（产品/地区/销售模式），三组都核一遍：
+  #   任一组列报出错都能独立暴露，且三组之间互为交叉印证。
+  - rule_id: IS04
+    dimension: C内
+    object: 酒类营业收入=茅台酒+系列酒
+    expr: "REVENUE_LIQUOR - (REVENUE_MOUTAI + REVENUE_SERIES)"
+    requires: [REVENUE_LIQUOR, REVENUE_MOUTAI, REVENUE_SERIES]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报第三节披露主营业务分产品情况"
+    source: "规则表 第11条（按产品分解）"
+
+  - rule_id: IS05
+    dimension: C内
+    object: 酒类营业成本=茅台酒+系列酒
+    expr: "COST_LIQUOR - (COST_MOUTAI + COST_SERIES)"
+    requires: [COST_LIQUOR, COST_MOUTAI, COST_SERIES]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报第三节披露主营业务分产品成本"
+    source: "规则表 第12条"
+
+  - rule_id: IS06
+    dimension: C内
+    object: 酒类营业收入=国内+国外
+    expr: "REVENUE_LIQUOR - (REVENUE_DOMESTIC + REVENUE_OVERSEAS)"
+    requires: [REVENUE_LIQUOR, REVENUE_DOMESTIC, REVENUE_OVERSEAS]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报第三节披露主营业务分地区情况"
+    source: "规则表 第11条（按地区分解）"
+
+  - rule_id: IS07
+    dimension: C内
+    object: 酒类营业收入=批发代理+直销
+    expr: "REVENUE_LIQUOR - (REVENUE_WHOLESALE + REVENUE_DIRECT)"
+    requires: [REVENUE_LIQUOR, REVENUE_WHOLESALE, REVENUE_DIRECT]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报第三节披露主营业务分销售模式情况"
+    source: "规则表 第11条（按销售模式分解）"
+
+  # ---- 现金流量表补充资料：净利润调节为经营活动现金流量（规则表 16 条完整式）----
+  # 补充资料表是固定模板逐行列示，空白行表示本年无此项（=0），
+  # 故调节项进 zero_if_absent；锚点两项（净利润、经营活动现金流量净额）缺失仍判 NA。
+  # 容差用 MAIN_TABLE（100 元、不随金额放大）：调节项都是元级明细数，
+  # 真出错时差额是亿元级，不需要宽容差；用百分比容差反而会把错误放过去。
+  - rule_id: CF02
+    dimension: C内
+    object: 经营活动现金流量净额=净利润+非付现及营运资本调整项
+    expr: "SUPP_CF_OPERATING - (SUPP_NET_PROFIT + SUPP_ASSET_IMPAIRMENT + SUPP_CREDIT_LOSS + SUPP_DEPRECIATION + SUPP_AMORT_ROU + SUPP_AMORT_INTANGIBLE + SUPP_AMORT_LT + SUPP_DISPOSAL_LOSS + SUPP_SCRAP_LOSS + SUPP_FV_LOSS + SUPP_FIN_EXPENSE + SUPP_INV_LOSS + SUPP_DTA_DECREASE + SUPP_DTL_INCREASE + SUPP_INV_DECREASE + SUPP_RECV_DECREASE + SUPP_PAYABLE_INCREASE)"
+    requires: [SUPP_CF_OPERATING, SUPP_NET_PROFIT]
+    zero_if_absent: [SUPP_ASSET_IMPAIRMENT, SUPP_CREDIT_LOSS, SUPP_DEPRECIATION, SUPP_AMORT_ROU, SUPP_AMORT_INTANGIBLE, SUPP_AMORT_LT, SUPP_DISPOSAL_LOSS, SUPP_SCRAP_LOSS, SUPP_FV_LOSS, SUPP_FIN_EXPENSE, SUPP_INV_LOSS, SUPP_DTA_DECREASE, SUPP_DTL_INCREASE, SUPP_INV_DECREASE, SUPP_RECV_DECREASE, SUPP_PAYABLE_INCREASE]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    applicable_if: "财报披露了现金流量表补充资料"
+    source: "规则表 第16条（完整式）"
+
+  # ---- 所有者权益变动表（规则表 13/15 条）----
+  # SI01 用 kind: report_year：未分配利润的期末/期初是时点数、
+  # 净利润与利润分配是时期数，必须按报告年度对齐后才能相加。
+  - rule_id: SI01
+    dimension: C内
+    kind: report_year
+    object: 未分配利润期末=期初+归母净利润+提取盈余公积+对所有者的分配
+    # 提取盈余公积与对所有者的分配取的是"未分配利润列"的金额（使未分配利润**减少**，
+    # 故为负数），所以这里是加号——不是把负数当正数做减法。
+    expr: "SI_UNDIST_END - (SI_UNDIST_BEG + SI_NP_PARENT + SI_SURPLUS_APPROP + SI_DIVIDEND)"
+    requires: [SI_UNDIST_END, SI_UNDIST_BEG, SI_NP_PARENT, SI_SURPLUS_APPROP, SI_DIVIDEND]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    applicable_if: "年报披露合并所有者权益变动表（含比较期）"
+    source: "规则表 第15条"
+
+  - rule_id: SI02
+    dimension: C内
+    object: 权益变动表：期末合计=期末归母小计+期末少数股东权益
+    expr: "SI_EQ_TOTAL_END - (SI_EQ_PARENT_END + SI_EQ_MINORITY_END)"
+    requires: [SI_EQ_TOTAL_END, SI_EQ_PARENT_END, SI_EQ_MINORITY_END]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报披露合并所有者权益变动表"
+    source: "规则表 第15条（权益变动表内部勾稽）"
+
+  - rule_id: SI03
+    dimension: C内
+    object: 权益变动表：归母综合收益总额=归母净利润+其他综合收益
+    expr: "SI_CI_PARENT - (SI_NP_PARENT + SI_OCI_PARENT)"
+    requires: [SI_CI_PARENT, SI_NP_PARENT, SI_OCI_PARENT]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报披露合并所有者权益变动表"
+    source: "规则表 第13条（综合收益与净利润的构成）"
+
+  - rule_id: NB01
+    dimension: C附
+    expr: "CASH_END - (CASH_ON_HAND + CASH_IN_BANK + CASH_OTHER)"
+    requires: [CASH_END, CASH_ON_HAND, CASH_IN_BANK, CASH_OTHER]
+    scope: CONSOLIDATED
+    tolerance: NOTE_DETAIL
+    severity: MED
+    source: "年报-第十节-合并资产负债表 + 附注七、1 货币资金"
+
+  # 主表 vs 附注：应收账款净额 = 账面余额 − 坏账准备（规则表 7/26 条）
+  # 明细取自附注"5、应收账款 (2)按坏账计提方法分类披露"的合计行。
+  - rule_id: NB02
+    dimension: C附
+    expr: "AR_NET - (AR_GROSS - AR_BADDEBT)"
+    requires: [AR_NET, AR_GROSS, AR_BADDEBT]
+    scope: CONSOLIDATED
+    tolerance: NOTE_DETAIL
+    severity: MED
+    applicable_if: "附注按坏账计提方法分类披露应收账款账面余额与坏账准备"
+    source: "年报-第十节-合并资产负债表 + 附注七、5 应收账款"
+
+  # ---- 表间一致（C间）----
+  # 转录自《贵州茅台一致性规则表（改）》第 13 / 16 条：同一指标在不同报表中
+  # 出现时必须相等。用现金流量表补充资料作对照——它同时披露净利润与
+  # 经营活动现金流量净额，正好可与利润表、现金流量表交叉核对。
+  - rule_id: LJ01
+    dimension: C间
+    object: 利润表净利润=现金流量表补充资料净利润
+    expr: "NET_PROFIT - SUPP_NET_PROFIT"
+    requires: [NET_PROFIT, SUPP_NET_PROFIT]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    applicable_if: "财报披露了现金流量表补充资料"
+    source: "规则表 第13条"
+
+  - rule_id: LJ02
+    dimension: C间
+    object: 现金流量表经营净额=补充资料经营净额
+    expr: "CF_OPERATING - SUPP_CF_OPERATING"
+    requires: [CF_OPERATING, SUPP_CF_OPERATING]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "财报披露了现金流量表补充资料"
+    source: "规则表 第16条（取净额一项作交叉核对）"
+
+  # 权益变动表 vs 资产负债表 / 利润表（规则表 13 条）
+  # ★ 规则表第 13 条写的是"利润表净利润 = 权益变动表综合收益总额 − 其他综合收益"。
+  #   该式只在**少数股东其他综合收益为 0** 时才等于合并净利润；照抄会在少数股东
+  #   有 OCI 的公司误报。这里改用恒等成立的口径：归母净利润直接取自
+  #   "综合收益总额行的未分配利润列"，与利润表归母净利润比。
+  - rule_id: LJ03
+    dimension: C间
+    object: 权益变动表归母净利润=利润表归母净利润
+    expr: "NP_PARENT - SI_NP_PARENT"
+    requires: [NP_PARENT, SI_NP_PARENT]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    applicable_if: "年报披露合并所有者权益变动表"
+    source: "规则表 第13条（口径改为归母净利润，避免少数股东 OCI 误报）"
+
+  - rule_id: LJ04
+    dimension: C间
+    object: 权益变动表期末所有者权益合计=资产负债表所有者权益合计
+    expr: "TOTAL_EQUITY - SI_EQ_TOTAL_END"
+    requires: [TOTAL_EQUITY, SI_EQ_TOTAL_END]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    applicable_if: "年报同时披露资产负债表与合并所有者权益变动表"
+    source: "年报-第十节-合并资产负债表 + 合并所有者权益变动表"
+
+  - rule_id: LJ05
+    dimension: C间
+    object: 权益变动表期末归母权益小计=资产负债表归属母公司所有者权益
+    expr: "EQUITY_PARENT - SI_EQ_PARENT_END"
+    requires: [EQUITY_PARENT, SI_EQ_PARENT_END]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: HIGH
+    applicable_if: "年报同时披露资产负债表与合并所有者权益变动表"
+    source: "年报-第十节-合并资产负债表 + 合并所有者权益变动表"
+
+  - rule_id: LJ06
+    dimension: C间
+    object: 权益变动表期末少数股东权益=资产负债表少数股东权益
+    expr: "EQUITY_MINORITY - SI_EQ_MINORITY_END"
+    requires: [EQUITY_MINORITY, SI_EQ_MINORITY_END]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "年报同时披露资产负债表与合并所有者权益变动表"
+    source: "年报-第十节-合并资产负债表 + 合并所有者权益变动表"
+
+  - rule_id: LJ07
+    dimension: C间
+    object: 补充资料现金及现金等价物净增加额=现金流量表净增加额
+    expr: "CF_NET_INCREASE - SUPP_CF_NET_INCREASE"
+    requires: [CF_NET_INCREASE, SUPP_CF_NET_INCREASE]
+    scope: CONSOLIDATED
+    tolerance: MAIN_TABLE
+    severity: MED
+    applicable_if: "财报披露了现金流量表补充资料"
+    source: "年报-第十节-合并现金流量表 + 现金流量表补充资料"
+
+  # ---- 跨期间衔接（C期）----
+  # 转录自《贵州茅台一致性规则表（改）》第 20 / 21 / 23 条：
+  # 本期期初数应等于上期期末数。同一时点（如 2024-12-31）在两份年报里
+  # 分别以"本期期末"和"下期期初"出现，两者必须相等。
+  # 注：该表第 19 条（固定资产**原值**期初=上期期末）**未转录**——
+  #     本项目提取的是固定资产**净额**，照搬会用错口径。需先补原值字段。
+  - rule_id: XQ_CASH
+    dimension: C期
+    kind: cross_period
+    object: 货币资金期初=上期期末
+    item: CASH_END
+    tolerance: CROSS_YEAR
+    severity: HIGH
+    applicable_if: "存在会计政策变更或追溯重述时转人工复核"
+    source: "规则表 第21条"
+
+  - rule_id: XQ_AR
+    dimension: C期
+    kind: cross_period
+    object: 应收账款期初=上期期末
+    item: AR_NET
+    tolerance: CROSS_YEAR
+    severity: HIGH
+    applicable_if: "存在报表重分类或前期差错更正时转人工复核"
+    source: "规则表 第20/22条"
+
+  - rule_id: XQ_INV
+    dimension: C期
+    kind: cross_period
+    object: 存货期初=上期期末
+    item: INVENTORY
+    tolerance: CROSS_YEAR
+    severity: MED
+    applicable_if: "存在存货计价政策变更或追溯重述时转人工复核"
+    source: "规则表 第23条"
+
+  # 权益变动表内的跨期衔接：同一份年报里就含比较期，
+  # "本期期初余额"与"上期期末余额"是同一时点的两个出处，必须相等（规则表第18条）。
+  - rule_id: XQ_UNDIST
+    dimension: C期
+    kind: cross_period
+    object: 未分配利润期初=上期期末
+    item: SI_UNDIST_END
+    item_beg: SI_UNDIST_BEG
+    tolerance: CROSS_YEAR
+    severity: HIGH
+    applicable_if: "存在会计政策变更、前期差错更正或报表重述时转人工复核"
+    source: "规则表 第18条"
+
+  - rule_id: XQ_SURPLUS
+    dimension: C期
+    kind: cross_period
+    object: 盈余公积期初=上期期末
+    item: SI_SURPLUS_END
+    item_beg: SI_SURPLUS_BEG
+    tolerance: CROSS_YEAR
+    severity: MED
+    applicable_if: "存在追溯重述时转人工复核"
+    source: "规则表 第18条（盈余公积口径）"
+
+  - rule_id: XQ_EQ_PARENT
+    dimension: C期
+    kind: cross_period
+    object: 权益变动表归母权益期初小计=上期期末
+    item: SI_EQ_PARENT_END
+    item_beg: SI_EQ_PARENT_BEG
+    tolerance: CROSS_YEAR
+    severity: MED
+    applicable_if: "存在会计政策变更、前期差错更正或报表重述时转人工复核"
+    source: "规则表 第18条（权益合计口径）"
+
+# 每条规则可附加的三个可选字段（CSV/Excel 版规则表的补充）：
+#   applicable_if:      适用条件（不满足则记 NA，不计入分母）
+#   on_not_applicable:  NA
+#   exempt_reason_required: true
+# 示例（规则 14 现金流净增加额 vs 货币资金变动）：
+#   applicable_if: "不存在财务公司或结算中心，且附注未披露受限资金调整"
+#   on_not_applicable: NA
+#   exempt_reason_required: true

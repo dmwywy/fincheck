@@ -1,0 +1,885 @@
+[
+  {
+    "claim_id": "r2026H1_p02_001",
+    "figures": [
+      "1.3%"
+    ],
+    "kind": "TEXT",
+    "page": 0,
+    "para": 2,
+    "para_no": null,
+    "section": "",
+    "sentence": "2026 上半年收入同比增长 1.3%，继续深化市场化改革",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p04_002",
+    "figures": [
+      "922.78 亿元",
+      "1.3%",
+      "445.17 亿元",
+      "2.0%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "贵州茅台发布 2026 半年报，公司2026H1实现总营收 922.78 亿元，同比增长 1.3%，实现归母净利润 445.17 亿元，同比减少 2.0%；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p04_003",
+    "figures": [
+      "444.64 亿元",
+      "2.0%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "实现扣非归母净利润 444.64 亿元，同比减少 2.0%；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p04_004",
+    "figures": [
+      "375.75 亿元",
+      "5.2%",
+      "172.74 亿元",
+      "6.9%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "其中 2026Q2 实现营业总收入 375.75 亿元，同比减少5.2%，实现归母净利润 172.74 亿元，同比减少 6.9%；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p04_005",
+    "figures": [
+      "172.24 亿元",
+      "7.1%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 4,
+    "para_no": 1,
+    "section": "核心观点",
+    "sentence": "实现扣非归母净利润 172.24 亿元，同比减少7.1%。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p05_006",
+    "figures": [
+      "317.2亿元",
+      "-1.0%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "分产品看，茅台酒 2026Q2 收入317.2亿元，同比-1.0%。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p05_007",
+    "figures": [
+      "50.5 亿元",
+      "25.0%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 5,
+    "para_no": 2,
+    "section": "核心观点",
+    "sentence": "系列酒 2026Q2 收入 50.5 亿元，同比降低 25.0%， 2026 年第二季度末经销商数量 2426 家、较第一季度末净增 204 家，单季增加 228 家、减少 24 家；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p06_008",
+    "figures": [
+      "224.6 亿元",
+      "33.8%",
+      "187.1 亿元",
+      "282.6%",
+      "83.3%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 6,
+    "para_no": 3,
+    "section": "核心观点",
+    "sentence": "2026Q2 直销收入 224.6 亿元，同比增长 33.8%，其中 i 茅台收入 187.1 亿元，同比增长282.6%，占直销收入 83.3%。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p06_009",
+    "figures": [
+      "143.1 亿元",
+      "34.9%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 6,
+    "para_no": 3,
+    "section": "核心观点",
+    "sentence": "批发代理收入 143.1 亿元，同比减少 34.9%；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p07_010",
+    "figures": [
+      "1.2pcts",
+      "89.5%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "2026Q2 毛利率同比降低 1.2pcts至89.5%，压力更多来自茅台酒内部产品结构、价格因素以及生产成本上升。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p07_011",
+    "figures": [
+      "17.2%",
+      "4.3%",
+      "4.7%",
+      "0.3pcts"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "2026Q2 税金及附加/销售/管理费用率分别为 17.2%/4.3%/4.7% ， 同比+0.1/-0.2/+0.3pcts；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p07_012",
+    "figures": [
+      "0.9pct",
+      "46.0%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "归母净利率同比降低 0.9pct 至 46.0%。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p07_013",
+    "figures": [
+      "31.78 亿元",
+      "30.27 亿元",
+      "1.51亿元"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "截至 2026Q2末合同负债 31.78 亿元，较一季度末 30.27 亿元增加 1.51亿元，主要系市场化改革下销售模式改变、预收款政策相应调整。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p07_014",
+    "figures": [
+      "984.22 亿元",
+      "3.5%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 7,
+    "para_no": 4,
+    "section": "核心观点",
+    "sentence": "2026H1公司销售收现984.22 亿元，同比+3.5%，回款仍具韧性。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p08_015",
+    "figures": [
+      "1993 亿元",
+      "2029 亿元",
+      "0.7%",
+      "6.0%",
+      "8.5%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 8,
+    "para_no": 5,
+    "section": "核心观点",
+    "sentence": "我们预计 2025-2027 年公司实现营业总收入 1733/1838/1993 亿元（前预测值为 1785/1882/2029 亿元），同比减少0.7%/6.0%/8.5%；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p08_016",
+    "figures": [
+      "972 亿元",
+      "977 亿元",
+      "0.1%",
+      "7.6%",
+      "9.7%"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 8,
+    "para_no": 5,
+    "section": "核心观点",
+    "sentence": "实现归母净利润 824/886/972 亿元（前预测值为840/895/977 亿元），同比增长0.1%/7.6%/9.7%；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p08_017",
+    "figures": [
+      "77.66元"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 8,
+    "para_no": 5,
+    "section": "核心观点",
+    "sentence": "实现 EPS 65.77/70.77/77.66元；",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "claim_id": "r2026H1_p08_018",
+    "figures": [
+      "17.3 倍"
+    ],
+    "kind": "TEXT",
+    "page": 1,
+    "para": 8,
+    "para_no": 5,
+    "section": "核心观点",
+    "sentence": "当前股价对应 PE 分别为 20.4/19.0/17.3 倍，维持“优于大市”评级。",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_00",
+    "figures": [
+      "2024",
+      "2025",
+      "2026",
+      "2027",
+      "2028"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 1,
+    "section": "表2",
+    "sentence": "盈利预测和财务指标 | 2024 | 2025 | 2026E | 2027E | 2028E",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_01",
+    "figures": [],
+    "kind": "TABLE_LABEL",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 2,
+    "section": "表2",
+    "sentence": "营业收入(百万元) | 174,144 | 172,054 | 173,340 | 183,763 | 199,348",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_02",
+    "figures": [
+      "15.7%",
+      "-1.2%",
+      "0.7%",
+      "6.0%",
+      "8.5%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 3,
+    "section": "表2",
+    "sentence": "(+/-%) | 15.7% | -1.2% | 0.7% | 6.0% | 8.5%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_03",
+    "figures": [],
+    "kind": "TABLE_LABEL",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 4,
+    "section": "表2",
+    "sentence": "净利润(千万元) | 86228 | 82320 | 82367 | 88628 | 97249",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_04",
+    "figures": [
+      "15.4%",
+      "-4.5%",
+      "0.1%",
+      "7.6%",
+      "9.7%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 5,
+    "section": "表2",
+    "sentence": "(+/-%) | 15.4% | -4.5% | 0.1% | 7.6% | 9.7%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_05",
+    "figures": [],
+    "kind": "TABLE_LABEL",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 6,
+    "section": "表2",
+    "sentence": "每股收益（元） | 68.64 | 65.74 | 65.77 | 70.77 | 77.66",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_06",
+    "figures": [
+      "67.9%",
+      "66.3%",
+      "64.8%",
+      "65.2%",
+      "65.9%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 7,
+    "section": "表2",
+    "sentence": "EBIT  Marg in | 67.9% | 66.3% | 64.8% | 65.2% | 65.9%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t01_07",
+    "figures": [
+      "37.0%",
+      "33.6%",
+      "31.5%",
+      "31.8%",
+      "33.1%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 1,
+    "para": null,
+    "para_no": null,
+    "row_no": 8,
+    "section": "表2",
+    "sentence": "净资产收益率（ROE） | 37.0% | 33.6% | 31.5% | 31.8% | 33.1%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_01",
+    "figures": [
+      "2026",
+      "2027",
+      "2028",
+      "2026",
+      "2027",
+      "2028",
+      "2026",
+      "2027",
+      "2028"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 2,
+    "section": "表3",
+    "sentence": " | 2026E | 2027E | 2028E | 2026E | 2027E | 2028E | 2026E | 2027E | 2028E",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_02",
+    "figures": [
+      "-2.9%",
+      "-2.4%",
+      "-1.8%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 3,
+    "section": "表3",
+    "sentence": "营业收入（百万元） | 178,496 | 188,235 | 202,916 | 173,340 | 183,763 | 199,348 | -2.9% | -2.4% | -1.8%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_03",
+    "figures": [
+      "3.74%",
+      "5.46%",
+      "7.80%",
+      "0.75%",
+      "6.01%",
+      "8.48%",
+      "-2.9pcts",
+      "0.5pcts",
+      "0.68pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 4,
+    "section": "表3",
+    "sentence": "收入同比增速% | 3.74% | 5.46% | 7.80% | 0.75% | 6.01% | 8.48% | -2.9pcts | 0.5pcts | 0.68pcts",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_04",
+    "figures": [
+      "90.08%",
+      "89.85%",
+      "90.00%",
+      "90.42%",
+      "90.50%",
+      "90.87%",
+      "0.34pcts",
+      "0.65pcts",
+      "0.87pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 5,
+    "section": "表3",
+    "sentence": "毛利率% | 90.08% | 89.85% | 90.00% | 90.42% | 90.50% | 90.87% | 0.34pcts | 0.65pcts | 0.87pcts",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_05",
+    "figures": [
+      "4.25%",
+      "4.00%",
+      "3.90%",
+      "4.23%",
+      "4.00%",
+      "3.90%",
+      "-0.02pcts",
+      "0pcts",
+      "0pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 6,
+    "section": "表3",
+    "sentence": "销售费用率% | 4.25% | 4.00% | 3.90% | 4.23% | 4.00% | 3.90% | -0.02pcts | 0pcts | 0pcts",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_06",
+    "figures": [
+      "-1.9%",
+      "-1.0%",
+      "-0.4%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 7,
+    "section": "表3",
+    "sentence": "归母净利润（百万元） | 83,979 | 89,481 | 97,659 | 82,367 | 88,628 | 97,249 | -1.9% | -1.0% | -0.4%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_07",
+    "figures": [
+      "2.01%",
+      "6.5%",
+      "9.14%",
+      "0.06%",
+      "7.60%",
+      "9.73%",
+      "-1.95pcts",
+      "1.05pcts",
+      "0.59pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 8,
+    "section": "表3",
+    "sentence": "归母净利润同比增速% | 2.01% | 6.5% | 9.14% | 0.06% | 7.60% | 9.73% | -1.95pcts | 1.05pcts | 0.59pcts",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_08",
+    "figures": [
+      "47.05%",
+      "47.54%",
+      "48.13%",
+      "47.52%",
+      "48.23%",
+      "48.78%",
+      "0.47pcts",
+      "0.69pcts",
+      "0.66pcts"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 9,
+    "section": "表3",
+    "sentence": "归母净利率% | 47.05% | 47.54% | 48.13% | 47.52% | 48.23% | 48.78% | 0.47pcts | 0.69pcts | 0.66pcts",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": "表1：盈利预测调整表（2026 年 8 月 16 日）",
+    "claim_id": "r2026H1_t02_09",
+    "figures": [
+      "-1.9%",
+      "-1.0%",
+      "-0.4%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 2,
+    "para": null,
+    "para_no": null,
+    "row_no": 10,
+    "section": "表3",
+    "sentence": "EPS（元） | 67.06 | 71.46 | 77.99 | 65.77 | 70.77 | 77.66 | -1.9% | -1.0% | -0.4%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t04_00",
+    "figures": [
+      "2024",
+      "2025",
+      "2026",
+      "2027",
+      "2028"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 1,
+    "section": "表5",
+    "sentence": "利润表（百万元） | 2024 | 2025 | 2026E | 2027E | 2028E",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t04_17",
+    "figures": [
+      "2024",
+      "2025",
+      "2026",
+      "2027",
+      "2028"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 18,
+    "section": "表5",
+    "sentence": "现金流量表（百万元） | 2024 | 2025 | 2026E | 2027E | 2028E",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_00",
+    "figures": [
+      "2024",
+      "2025",
+      "2026",
+      "2027",
+      "2028"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 1,
+    "section": "表6",
+    "sentence": "资产负债表（百万元） | 2024 | 2025 | 2026E | 2027E | 2028E",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_23",
+    "figures": [
+      "2024",
+      "2025",
+      "2026",
+      "2027",
+      "2028"
+    ],
+    "kind": "TABLE_HEADER",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 24,
+    "section": "表6",
+    "sentence": "关键财务与估值指标 | 2024 | 2025 | 2026E | 2027E | 2028E",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_27",
+    "figures": [
+      "77.5%",
+      "70.9%",
+      "61.1%",
+      "59.4%",
+      "62.2%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 28,
+    "section": "表6",
+    "sentence": "ROIC | 77.5% | 70.9% | 61.1% | 59.4% | 62.2%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_28",
+    "figures": [
+      "37.0%",
+      "33.6%",
+      "31.5%",
+      "31.8%",
+      "33.1%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 29,
+    "section": "表6",
+    "sentence": "ROE | 37.0% | 33.6% | 31.5% | 31.8% | 33.1%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_29",
+    "figures": [
+      "92.1%",
+      "91.3%",
+      "90.4%",
+      "90.5%",
+      "90.9%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 30,
+    "section": "表6",
+    "sentence": "毛利率 | 92.1% | 91.3% | 90.4% | 90.5% | 90.9%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_30",
+    "figures": [
+      "67.9%",
+      "66.3%",
+      "64.8%",
+      "65.2%",
+      "65.9%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 31,
+    "section": "表6",
+    "sentence": "EBIT Marg in | 67.9% | 66.3% | 64.8% | 65.2% | 65.9%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_31",
+    "figures": [
+      "69.0%",
+      "67.6%",
+      "66.4%",
+      "66.8%",
+      "67.5%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 32,
+    "section": "表6",
+    "sentence": "EBITDA  Marg in | 69.0% | 67.6% | 66.4% | 66.8% | 67.5%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_32",
+    "figures": [
+      "15.7%",
+      "-1.2%",
+      "0.7%",
+      "6.0%",
+      "8.5%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 33,
+    "section": "表6",
+    "sentence": "收入增长 | 15.7% | -1.2% | 0.7% | 6.0% | 8.5%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_33",
+    "figures": [
+      "15.4%",
+      "-4.5%",
+      "0.2%",
+      "7.6%",
+      "9.7%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 34,
+    "section": "表6",
+    "sentence": "净利润增长率 | 15.4% | -4.5% | 0.2% | 7.6% | 9.7%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_34",
+    "figures": [
+      "22.0%",
+      "19.5%",
+      "19.1%",
+      "18.9%",
+      "19.1%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 35,
+    "section": "表6",
+    "sentence": "资产负债率 | 22.0% | 19.5% | 19.1% | 18.9% | 19.1%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  },
+  {
+    "caption": null,
+    "claim_id": "r2026H1_t05_35",
+    "figures": [
+      "4.2%",
+      "4.0%",
+      "3.9%",
+      "4.2%",
+      "4.9%"
+    ],
+    "kind": "TABLE_ROW",
+    "page": 3,
+    "para": null,
+    "para_no": null,
+    "row_no": 36,
+    "section": "表6",
+    "sentence": "股息率 | 4.2% | 4.0% | 3.9% | 4.2% | 4.9%",
+    "source": "贵州茅台-【2026上半年】模拟研究报告（用于.docx",
+    "source_hash": "6b24cede768c19c34e2d4cddf8071940ba5a43c826c2b32c5b901ebd1a2535de"
+  }
+]

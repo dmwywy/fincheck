@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "matches": [
+    {
+      "claim_id": "demo-001",
+      "item_code": "REVENUE",
+      "period": "2024",
+      "confidence": 0.95,
+      "reason": "句子提到营业收入"
+    }
+  ]
+}

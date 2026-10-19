@@ -1,0 +1,21 @@
+# rules/tolerance.yaml
+# 有效容差 = max(abs 下限, rel * max(|左值|, |右值|))，并对"按披露单位"再取下限
+# floor_by_unit=true 时，下限不得低于半个披露单位（元=0.5、千元=500、万元=5000、百万元=5万、亿元=50万）
+#
+# provisional（临时口径）：本表是容差档位的唯一来源，但档位与规则表分类存在冲突
+# （表间 500 元无对应档、跨期 1 vs 5、附注 100 vs 1000）。当前**按本表现值落地并标注 provisional**，
+# 待业务负责人裁定后再升版本；四项争议与推荐默认值见过程材料中的 决策口径对比_provisional.md（不在本源码仓内）。
+version: "1.0"
+
+profiles:
+  MAIN_TABLE:   {abs: "100",  rel: "0",      floor_by_unit: true,  desc: "主表对主表"}
+  NOTE_DETAIL:  {abs: "1000", rel: "0.0001", floor_by_unit: true,  desc: "涉及附注明细加总"}
+  CROSS_YEAR:   {abs: "5",    rel: "0",      floor_by_unit: true,  desc: "跨期期初期末衔接"}
+  REPORT_REF:   {abs: "0",    rel: "0.005",  floor_by_unit: false, desc: "研报引用（相对差异，审计 0.5%）"}
+
+unit_floor:        # 半个披露单位
+  "元":     "0.5"
+  "千元":   "500"
+  "万元":   "5000"
+  "百万元": "50000"
+  "亿元":   "500000"

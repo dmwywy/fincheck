@@ -1,0 +1,11 @@
+{
+  "confidence": 0.95,
+  "evidence": {
+    "chunk_id": "p042_t1",
+    "quote": "合并资产负债表   单位：万元   2025年12月31日"
+  },
+  "ok": true,
+  "period_type": "BAL_END",
+  "scope": "CONSOLIDATED",
+  "unit": "万元"
+}

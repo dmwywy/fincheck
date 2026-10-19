@@ -1,0 +1,37 @@
+# credentials - never commit
+.env
+.env.*
+!.env.example
+
+# run artifacts - keep baseline cache only
+runs/*
+!runs/demo_baseline/
+!runs/demo_baseline/**
+
+# backups and temp
+runs_backup/
+*.bak
+
+# environment and caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# PyInstaller 中间产物与自动下载的内嵌运行时（fincheck-launcher.exe 本身要交付，不忽略）
+build/
+dist/
+*.spec
+.runtime/
+
+# 启动器运行日志（启动标记 + 崩溃堆栈，仅本地排查用）
+launcher_run.log
+
+# editor - allow settings.json only
+.vscode/*
+!.vscode/settings.json
+
+# large files - use shared drive
+data/full/
+*.zip
+*.mp4
