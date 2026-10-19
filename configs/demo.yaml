@@ -1,4 +1,4 @@
-# configs/demo.yaml —— 初赛最小验证范围
+# configs/demo.yaml —— FinCheck 默认最小验证范围
 run:
   company: 贵州茅台
   materials:

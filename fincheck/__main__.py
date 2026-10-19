@@ -105,7 +105,7 @@ def print_report(run_id: str, formats: str = "pdf,xlsx,html") -> None:
 
 def main(argv=None):
     p = argparse.ArgumentParser(prog="fincheck",
-                                description="财报一致性量化核查智能体")
+                                description="FinCheck 财报一致性核查智能体")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("run", help="运行一次核查")

@@ -1,5 +1,5 @@
 # app.py —— 网页入口
-"""财报一致性量化核查智能体 · 网页界面。
+"""FinCheck 财报一致性核查智能体 · 网页界面。
 
 运行：streamlit run app.py
 
@@ -16,8 +16,8 @@ import streamlit as st
 
 # CSI 口径提示：与报告三格式共用同一份文案，避免"满分 = 全部维度通过"的误导
 # 「异常 / 待复核」计数同样与报告总评同源，见 src.report.merged_anomaly_counts
-from src.report import (_csi_caveat, expected_text, loc_str, merged_anomaly_counts,
-                        unprocessed_entries)
+from src.report import (_csi_caveat, _csi_exec_note, expected_text, loc_str,
+                        merged_anomaly_counts, unprocessed_entries)
 
 ROOT = Path(__file__).resolve().parent
 STATUS_ZH = {"PASS": "通过", "FAIL": "异常", "REVIEW": "需人工复核", "NA": "不适用"}
@@ -25,7 +25,7 @@ DIM_ZH = {"C内": "表内勾稽", "C间": "表间一致", "C期": "跨期衔接"
           "C附": "主表与附注", "C研": "研报引用"}
 DISCLAIMER = "本系统输出为财务数据一致性核查结果，不构成投资建议，所有结论需人工复核。"
 
-st.set_page_config(page_title="财报一致性核查", layout="wide")
+st.set_page_config(page_title="FinCheck · 财报一致性核查", layout="wide")
 
 
 def _read(p: Path, default=None):
@@ -42,8 +42,9 @@ def list_runs() -> list[str]:
     return sorted((p.name for p in d.iterdir() if p.is_dir()), reverse=True)
 
 
-st.title("财报一致性量化核查智能体")
-st.caption("上传财报，运行一致性核查，并查看与下载报告")
+st.title("FinCheck · 财报一致性核查智能体")
+st.caption("把研报与财报摆在一起逐条对：程序按确定性规则核对表内勾稽、跨期衔接与研报引用，"
+          "指出「研报写的」与「财报实际的」差在哪里、该项应为的正确写法。")
 st.warning(DISCLAIMER)
 
 with st.container(border=True):
@@ -271,7 +272,40 @@ with tab1:
 
 # ---- ② 一致性指标 ----
 with tab2:
+    # ---- 指标卡（口径与报告总评同源，不得另起一套统计） ----
+    _processed_files = max(0, len(_ingest_log) - len(_unrecognized))
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("CSI 总分", csi.get("csi") if csi.get("csi") is not None else "—",
+              csi.get("grade_label", ""), delta_color="off")
+    k2.metric("发现异常", n_fail,
+              help="规则级 FAIL + 研报引用 FAIL。计数口径与报告总评、①异常清单完全一致。")
+    k3.metric("待人工复核", n_review,
+              help="规则级 REVIEW + 研报引用 REVIEW 与待复核清单。计数口径与报告总评完全一致。")
+    k4.metric("已核查文件", _processed_files,
+              help="成功参与字段提取与核查的上传文件数，不含未识别 / 处理失败 / 未抽出内容的文件。")
+
+    # ---- 核查图表（与报告三端同源；只做呈现，不做数值计算） ----
+    from src.viz import anomaly_distribution, csi_radar, research_error_compare
     dims = csi.get("dimensions") or {}
+    st.subheader("核查图表")
+    _fig_r, _fig_d = csi_radar(csi), anomaly_distribution(results, research, csi)
+    if _fig_r or _fig_d:
+        _vc1, _vc2 = st.columns(2)
+        if _fig_r:
+            _vc1.plotly_chart(_fig_r, key="viz_radar")
+            _vc1.caption(_csi_exec_note(csi))
+        if _fig_d:
+            _vc2.plotly_chart(_fig_d, key="viz_dist")
+            _vc2.caption("异常与待复核的计数与报告总评、①异常清单完全同源（含 0 条的维度）。")
+    else:
+        st.info("本次运行没有异常或待复核条目，也没有可执行的 CSI 维度，未生成图表。")
+    _fig_e = research_error_compare(research)
+    if _fig_e:
+        st.plotly_chart(_fig_e, key="viz_err")
+        st.caption("「研报写的」= 研报原文值；「应为（正确值）」= 系统核出的正确写法"
+                   "（无确定性结论时为「—」）。过长原文已截断，完整原文与证据定位见①异常清单。")
+
+    st.divider()
     if not dims:
         st.info("本次运行没有可执行的规则，未计算 CSI。")
     else:
@@ -296,10 +330,6 @@ with tab2:
             f"- 不适用维度：`{','.join(csi.get('na_dimensions') or []) or '无'}`（权重已分摊）")
         if _csi_caveat_text:
             st.warning(f"CSI 口径提示：{_csi_caveat_text}")
-
-        scored = {k: v["score"] for k, v in dims.items() if v["score"] is not None}
-        if scored:
-            st.bar_chart(pd.DataFrame({"得分": scored}))
 
 # ---- ③ 提取字段 ----
 with tab3:

@@ -692,8 +692,10 @@ def render_pdf(model: dict, path: Path) -> Path:
         ]))
         return t
 
-    story = [Paragraph("财报一致性核查报告", h1),
+    story = [Paragraph("FinCheck 财报一致性核查报告", h1),
              Paragraph(f"运行编号 {model['run_id']} ｜ 生成时间 {model['generated_at']}", small),
+             Paragraph("面向投资者的财报与研报一致性核查：把「研报写的」与「财报实际的」"
+                       "摆在一起逐条核对，并给出该项应为的正确写法。", small),
              Spacer(1, 4),
              Paragraph(f"<b>{DISCLAIMER}</b>", body),
              Spacer(1, 8)]
@@ -702,6 +704,17 @@ def render_pdf(model: dict, path: Path) -> Path:
     story.append(Paragraph("核查总评", h2))
     for p in model.get("summary") or []:
         story.append(Paragraph(_esc(p), body))
+    # 核查图表（与网页端、HTML 报告同一份图形数据；PDF 侧为 reportlab 静态图）
+    from src.viz import anomaly_distribution_drawing, csi_radar_drawing
+    _dist = anomaly_distribution_drawing(model.get("rule_results") or [],
+                                         model.get("research") or {},
+                                         csi=model.get("csi"))
+    if _dist is not None:
+        story.append(Spacer(1, 4))
+        story.append(_dist)
+        story.append(Paragraph(
+            "图：异常与待人工复核按一致性维度分布。计数与报告总评、网页端指标卡完全同源；"
+            "标注「0」的维度表示本次运行在该维度未发现异常。", small))
     story.append(Spacer(1, 8))
 
     # 1 项目基本信息 / 2 材料范围
@@ -878,6 +891,15 @@ def render_pdf(model: dict, path: Path) -> Path:
         if caveat:
             story.append(Spacer(1, 3))
             story.append(Paragraph(f"<b>【口径提示】</b>{_esc(caveat)}", small))
+        # 雷达图：五个维度的得分一览。不适用维度画在原点并注明权重已分摊，
+        # 避免被误读成「得分为 0 的不合格维度」。
+        _radar = csi_radar_drawing(csi)
+        if _radar is not None:
+            story.append(Spacer(1, 4))
+            story.append(_radar)
+            story.append(Paragraph(
+                "图：五个一致性维度的得分雷达图（得分 = (通过数 + 0.5 × 待复核数) ÷ 可执行规则数）。",
+                small))
     else:
         story.append(Paragraph("本次运行无可执行的规则，未计算 CSI。", body))
 
@@ -923,7 +945,7 @@ def render_pdf(model: dict, path: Path) -> Path:
     SimpleDocTemplate(str(path), pagesize=A4,
                       leftMargin=18 * mm, rightMargin=18 * mm,
                       topMargin=16 * mm, bottomMargin=16 * mm,
-                      title=f"财报一致性核查报告 {model['run_id']}").build(story)
+                      title=f"FinCheck 财报一致性核查报告 {model['run_id']}").build(story)
     return path
 
 
@@ -1093,7 +1115,7 @@ def render_xlsx(model: dict, path: Path) -> Path:
 # ---------------- HTML ----------------
 
 _HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
-<title>财报一致性核查报告 {run_id}</title>
+<title>FinCheck 财报一致性核查报告 {run_id}</title>
 <style>
  body{{font-family:"Microsoft YaHei",system-ui,sans-serif;margin:0;background:#f7f8fa;color:#222}}
  .wrap{{max-width:1100px;margin:0 auto;padding:24px}}
@@ -1108,10 +1130,12 @@ _HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .REVIEW{{color:#b7791f}} .PASS{{color:#1e7a46}} .NA{{color:#888}}
  .csi{{font-size:18px;font-weight:700;margin:8px 0}}
  code{{background:#f0f2f5;padding:1px 4px;border-radius:3px;font-size:12px}}
+ .viz{{background:#fff;border:1px solid #e3e6ea;border-radius:6px;padding:4px 8px;margin:10px 0}}
 </style>
 <div class="wrap">
-<h1>财报一致性核查报告</h1>
+<h1>FinCheck 财报一致性核查报告</h1>
 <div class="meta">运行编号 {run_id} ｜ 生成时间 {generated_at} ｜ 报告版本 {report_version}</div>
+<div class="meta">面向投资者的财报与研报一致性核查：把「研报写的」与「财报实际的」摆在一起逐条核对，并给出该项应为的正确写法。</div>
 <div class="warn">{disclaimer}</div>
 {sections}
 </div></html>"""
@@ -1138,6 +1162,18 @@ def render_html(model: dict, path: Path) -> Path:
     # 核查总评：成段结论置顶，便于评审直接读到核查规模、异常分布与 CSI 等级
     sections.append("<h2>核查总评</h2>" + "".join(
         f"<p>{_esc(p)}</p>" for p in (model.get("summary") or [])))
+    # 核查图表：与网页端同一份图形数据（Plotly 交互图，plotly.js 内联一次，报告可离线打开）。
+    # ★ 缺 plotly 或缺数据时只影响本节，不得影响报告正文生成。
+    try:
+        from src.viz import figures_html
+        _figs = figures_html(model.get("csi"), model.get("rule_results") or [],
+                             model.get("research") or {})
+    except Exception:  # noqa: BLE001
+        _figs = ""
+    if _figs:
+        sections.append("<h2>核查图表</h2>" + _figs +
+                        '<p class="meta">图表与网页端同源：「异常 / 待复核」计数与报告总评'
+                        '完全一致；「应为（正确值）」无确定性结论时显示「—」，不臆造。</p>')
     sections.append("<h2>一、项目基本信息与材料范围</h2>" + _table(
         ["项", "值"],
         [["运行编号", model["run_id"]],

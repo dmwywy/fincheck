@@ -1,0 +1,11 @@
+# FinCheck 网页端主题与运行配置
+[theme]
+primaryColor = "#2D6CDF"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F7F8FA"
+textColor = "#222222"
+font = "sans serif"
+
+[browser]
+# 半封闭运行环境：不上报使用统计
+gatherUsageStats = false

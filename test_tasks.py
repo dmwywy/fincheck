@@ -1908,7 +1908,7 @@ def test_web_app_renders_without_exception():
     _make_run_fixture("pytest_web")
     at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
     assert not at.exception, [str(e.value) for e in at.exception]
-    assert [t.value for t in at.title] == ["财报一致性量化核查智能体"]
+    assert [t.value for t in at.title] == ["FinCheck · 财报一致性核查智能体"]
 
     labels = [m.label for m in at.metric]
     # CSI 指标卡在口径未裁定（provisional）时会带上「（临时）」后缀，故按前缀匹配
@@ -2981,4 +2981,147 @@ def test_mcp_server_stdio_protocol_roundtrip():
     assert "metrics" in json.loads(by_id[3]["result"]["content"][0]["text"])
     assert by_id[4]["result"]["resources"]
     assert by_id[5]["error"]["code"] == -32601
+
+
+# ---------------- 可视化（src/viz.py）：口径一致性 + 渲染 ----------------
+
+def _viz_sample():
+    """可视化测试样例：覆盖规则级（C内/C期/C间）与研报级（C研）两个数据源与三种状态。"""
+    rules = [
+        {"rule_id": "BS01@1.0", "dimension": "C内", "status": "PASS"},
+        {"rule_id": "IS01@1.0", "dimension": "C内", "status": "FAIL"},
+        {"rule_id": "CF01@1.0", "dimension": "C期", "status": "REVIEW"},
+        {"rule_id": "BS02@1.0", "dimension": "C间", "status": "NA"},
+    ]
+    research = {
+        "results": [
+            {"claim_id": "c1", "dimension": "C研", "status": "FAIL", "cause": "UNIT_SCALE",
+             "item_code": "NET_PROFIT", "period": "2024",
+             "left": {"source": "research_report", "raw": "862.3亿万元"},
+             "expected": "862.3亿元", "reason": "单位写法有误",
+             "evidence": {"file": "b.docx", "page": 1, "para_no": 1, "section": "核心观点",
+                          "sentence": "2024 年归母净利润 862.3亿万元"}},
+            {"claim_id": "c2", "dimension": "C研", "status": "PASS"},
+            {"claim_id": "c3", "dimension": "C研", "status": "REVIEW"},
+        ],
+        # review 段整段都是「程序无法自动判定」的待复核条目，其中一条不带 dimension
+        "review": [{"claim_id": "c4", "dimension": "C研", "reason": "模型未返回匹配结果"},
+                   {"claim_id": "c5", "reason": "无对应财报期间"}],
+    }
+    return rules, research
+
+
+def _viz_csi():
+    """可视化测试样例的 CSI：含 2 个全「不适用」维度，覆盖 NA 的呈现口径。"""
+    return {"csi": 80.0, "grade": "B", "grade_label": "基本一致",
+            "na_dimensions": ["C间", "C附"], "provisional": True,
+            "dimensions": {
+                "C内": {"score": 1.0, "rules_applicable": 2, "pass": 1, "fail": 1,
+                        "review": 0, "na": 0},
+                "C间": {"score": None, "rules_applicable": 0, "pass": 0, "fail": 0,
+                        "review": 0, "na": 1},
+                "C期": {"score": 0.5, "rules_applicable": 1, "pass": 0, "fail": 0,
+                        "review": 1, "na": 0},
+                "C附": {"score": None, "rules_applicable": 0, "pass": 0, "fail": 0,
+                        "review": 0, "na": 1},
+                "C研": {"score": 0.0, "rules_applicable": 1, "pass": 0, "fail": 1,
+                        "review": 0, "na": 0}}}
+
+
+def test_viz_counts_stay_on_single_source():
+    """图形口径不得分裂：按维度拆分后的合计必须等于 merged_anomaly_counts。"""
+    from src.report import merged_anomaly_counts
+    from src.viz import (anomaly_by_dimension, dimension_rows, research_error_rows)
+
+    rules, research = _viz_sample()
+    n_fail, n_review = merged_anomaly_counts(rules, research)
+    assert (n_fail, n_review) == (2, 4)
+
+    by = anomaly_by_dimension(rules, research)
+    assert sum(v["fail"] for v in by.values()) == n_fail
+    assert sum(v["review"] for v in by.values()) == n_review
+    # 维度顺序固定；C内=1异常、C期=1待复核、C研=1异常+3待复核（含无 dimension 的一条）
+    assert [(r["dimension"], r["fail"], r["review"]) for r in dimension_rows(rules, research)] \
+        == [("C内", 1, 0), ("C期", 0, 1), ("C研", 1, 3)]
+    assert by.get("C附") is None, "NA/PASS 不计入异常分布，不得凭空补零条维度"
+
+    rows = research_error_rows(research)
+    assert len(rows) == 1
+    assert rows[0]["written"] == "862.3亿万元" and rows[0]["should"] == "862.3亿元"
+    assert rows[0]["cause_zh"] == "单位量级错误" and "p1" in rows[0]["location"]
+
+
+def test_viz_figures_render_and_carry_same_numbers():
+    """三张图能渲染，且图上数字与单一口径一致（不适用维度按口径单独标注）。"""
+    import pytest
+    pytest.importorskip("plotly")
+    from src.report import merged_anomaly_counts
+    from src.viz import (anomaly_distribution, csi_radar, figures_html,
+                         research_error_compare)
+
+    rules, research = _viz_sample()
+    csi = _viz_csi()
+
+    radar = csi_radar(csi)
+    assert radar is not None
+    r = list(radar.data[0].r)
+    assert len(r) == 6 and r[0] == r[5] == 100.0          # 首尾闭合
+    assert radar.data[1].name.startswith("不适用") and list(radar.data[1].r) == [0.0, 0.0]
+
+    dist = anomaly_distribution(rules, research, csi)
+    n_fail, n_review = merged_anomaly_counts(rules, research)
+    assert sum(dist.data[0].y) == n_fail and sum(dist.data[1].y) == n_review
+    # 传 csi 时横轴补齐 5 个维度，数值仍全部来自单一口径（0 条维度画 0）
+    assert len(dist.data[0].x) == 5 and dist.data[0].x[0].startswith("C内")
+
+    err = research_error_compare(research)
+    cells = list(err.data[0].cells.values)
+    assert cells[0] == ["单位量级错误"]
+    assert cells[1] == ["862.3亿万元"] and cells[2] == ["862.3亿元"]
+
+    # 缺数据时必须返回 None（调用方据此跳过），不得抛异常
+    assert csi_radar({}) is None
+    assert anomaly_distribution([], {}) is None
+    assert research_error_compare({}) is None
+    assert figures_html({}, [], {}) == ""
+
+
+def test_viz_pdf_drawings_render_with_chinese_font(tmp_path):
+    """PDF 静态图必须可渲染：中文字体显式指定，绘制到真实 PDF 不抛异常。"""
+    from reportlab.graphics import renderPDF
+    from reportlab.pdfgen import canvas
+    from src.viz import (anomaly_distribution_drawing, csi_radar_drawing,
+                         register_pdf_font)
+
+    rules, research = _viz_sample()
+    csi = _viz_csi()
+    assert register_pdf_font() == "STSong-Light"
+
+    drawings = [csi_radar_drawing(csi), anomaly_distribution_drawing(rules, research, csi=csi)]
+    assert all(d is not None for d in drawings)
+    for d in drawings:
+        c = canvas.Canvas(str(tmp_path / "viz.pdf"))
+        renderPDF.draw(d, c, 20, 400)
+        c.showPage()
+        c.save()
+    assert (tmp_path / "viz.pdf").stat().st_size > 0
+    # 无数据时同样返回 None，不抛异常
+    assert csi_radar_drawing({}) is None
+    assert anomaly_distribution_drawing([], {}) is None
+
+
+def test_report_html_embeds_viz_figures():
+    """HTML 报告必须内嵌核查图表（Plotly），且报告正文不因图形缺失而受影响。"""
+    from src.pipeline import ROOT
+    from src.report import build_all
+
+    _make_run_fixture("pytest_report_viz")
+    made = build_all("pytest_report_viz", ("html",))
+    html = (ROOT / made["html"]).read_text(encoding="utf-8")
+    assert "核查图表" in html
+    assert "plotly-graph-div" in html and "plotly.js" in html
+    # plotly 内嵌的图形数据里中文按 \uXXXX 转义，两种形态都要认
+    title = json.dumps("研报纠错对比")[1:-1]
+    assert title in html or "研报纠错对比" in html
+    assert "核查总评" in html and "CSI" in html
 

@@ -37,10 +37,10 @@ RUN_ID = "reproduce"
 # （多半被安全软件静默拦截或 onefile 解包失败）。
 LOG_FILE = ROOT / "launcher_run.log"
 
-# 依赖导入名（requirements.txt 里对应的包：openai / pydantic / PyYAML /
-# pdfplumber / reportlab / openpyxl / pandas / streamlit）
+# 依赖导入名（requirements.txt 里对应的包：openai / pydantic / PyYAML / pdfplumber /
+# reportlab / openpyxl / pandas / streamlit / plotly）
 NEEDED = ["openai", "pydantic", "yaml", "pdfplumber",
-          "reportlab", "openpyxl", "pandas", "streamlit"]
+          "reportlab", "openpyxl", "pandas", "streamlit", "plotly"]
 
 PY_MIN = (3, 10)
 PY_WARN_MAX = (3, 13)                # 3.13+ 部分依赖可能没有预编译轮子，只提醒不阻断
@@ -511,7 +511,7 @@ def _setup_console() -> None:
 def diagnose() -> int:
     """--diagnose：一次性环境体检，用于把问题整屏输出给他人排查。"""
     line()
-    line("  财报一致性量化核查智能体 · 环境诊断（--diagnose）")
+    line("  FinCheck 财报一致性核查智能体 · 环境诊断（--diagnose）")
     line(f"  项目根目录：{ROOT}")
     line(f"  运行方式：{Path(sys.executable).name + '（冻结）' if FROZEN else 'python launcher.py（源码）'}")
 
@@ -530,7 +530,7 @@ def diagnose() -> int:
     step("[3] 依赖包")
     if cmd:
         absent = _missing(cmd, NEEDED)
-        line("  [OK] 8 个依赖全部可导入" if not absent
+        line(f"  [OK] {len(NEEDED)} 个依赖全部可导入" if not absent
              else f"  [!!] 无法导入：{', '.join(absent)}")
     else:
         line("  [跳过] 无可用解释器")
@@ -567,7 +567,7 @@ def main() -> int:
         return diagnose()
 
     line()
-    line("  财报一致性量化核查智能体 · 交互式启动器")
+    line("  FinCheck 财报一致性核查智能体 · 交互式启动器")
     line("  （离线模式不需要网络与 API Key，可直接用于评审复现）")
 
     if not check_tree():

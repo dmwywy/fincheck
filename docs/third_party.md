@@ -27,7 +27,8 @@
 |---|---|---|---|---|
 | streamlit | 1.64.0 | PyPI | Apache-2.0 | 网页界面入口 `app.py`（上传核查、5 个结果页签、报告下载） |
 | openpyxl | 3.1.5 | PyPI | MIT | `src/report.py` 生成 `report.xlsx`（摘要/异常清单/规则明细/提取字段/研报引用/待人工复核） |
-| reportlab | 4.2.5 | PyPI | BSD-3-Clause | `src/report.py` 生成 `report.pdf`（13 项内容 + 免责声明） |
+| reportlab | 4.2.5 | PyPI | BSD-3-Clause | `src/report.py` 生成 `report.pdf`（13 项内容 + 免责声明）；`src/viz.py` 以 `renderPDF.Drawing` 手绘雷达图与异常分布图（静态矢量，零额外依赖） |
+| plotly | 7.1.0 | PyPI | MIT | `src/viz.py` 的交互式图形引擎：网页端 `app.py` 与 HTML 报告内嵌「一致性维度雷达图 / 异常分布 / 研报纠错对比表」；`figures_html()` 用 `plotly.offline.get_plotlyjs()` 将 plotly.js 一次性内联，报告无需联网即可打开 |
 
 ---
 
