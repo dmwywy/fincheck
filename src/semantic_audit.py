@@ -31,6 +31,19 @@ AUDIT_BATCH = MAX_AUDIT_CLAIMS
 DEFAULT_CAUSE = "UNCERTAIN"   # 程序"判不了"的条目在去重键上等价于这个兜底原因
 
 
+def _review_all(rc: dict) -> list[dict]:
+    """「程序未判定」的全部条目：待复核段 + 预测值/口径不可比两个单列桶。
+
+    ★ 三处（审计优先级、去重键、已判线索）都要覆盖这三个来源：两个新桶虽然不计入
+      「待复核」计数，但它们同样是"程序没给结论"的条目，模型审计若重复报同一处，
+      报告里会出现同一句话两条提示，读者会以为是两个问题。
+    """
+    out = list(rc.get("review") or [])
+    for key in ("prediction", "incomparable"):
+        out += list(rc.get(key) or [])
+    return out
+
+
 def _audit_order(rc: dict, claims: list[dict]) -> list[dict]:
     """待审 claim 的优先级：先 REVIEW（程序判不了、最可能藏着真问题）后 PASS，最后 FAIL。
 
@@ -40,7 +53,7 @@ def _audit_order(rc: dict, claims: list[dict]) -> list[dict]:
     status: dict[str, int] = {}
     for r in rc.get("results") or []:
         status[r.get("claim_id")] = 0 if r.get("status") == "FAIL" else 1
-    for r in rc.get("review") or []:
+    for r in _review_all(rc):
         status.setdefault(r.get("claim_id"), 2)
     ranked = sorted(claims, key=lambda c: (-status.get(c.get("claim_id"), 1),
                                            str(c.get("claim_id"))))
@@ -48,17 +61,17 @@ def _audit_order(rc: dict, claims: list[dict]) -> list[dict]:
 
 
 def _program_keys(rc: dict) -> set[tuple]:
-    """程序已判定的去重键 (claim_id, cause)。REVIEW 条目无 cause，按兜底原因计。"""
+    """程序已判定的去重键 (claim_id, cause)。未判定的条目无 cause，按兜底原因计。"""
     keys = {(r.get("claim_id"), r.get("cause") or DEFAULT_CAUSE)
             for r in rc.get("results") or []}
-    keys |= {(r.get("claim_id"), DEFAULT_CAUSE) for r in rc.get("review") or []}
+    keys |= {(r.get("claim_id"), DEFAULT_CAUSE) for r in _review_all(rc)}
     return keys
 
 
 def _program_findings(rc: dict, ids: set[str]) -> list[dict]:
     """本批 claim 对应的程序结论，喂给模型只为让它"别重复报已经判过的问题"。"""
     out = []
-    for r in list(rc.get("results") or []) + list(rc.get("review") or []):
+    for r in list(rc.get("results") or []) + _review_all(rc):
         if r.get("claim_id") in ids:
             out.append(r)
     return out

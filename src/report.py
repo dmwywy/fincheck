@@ -19,6 +19,8 @@ from pathlib import Path
 
 from decimal import Decimal, InvalidOperation
 
+from src.research_check import INCOMPARABLE_REASON_TYPES, PREDICTION_REASON_TYPES
+
 ROOT = Path(__file__).resolve().parents[1]
 
 DISCLAIMER = "本系统输出为财务数据一致性核查结果，不构成投资建议，所有结论需人工复核。"
@@ -26,6 +28,28 @@ REPORT_VERSION = "1.0"
 STATUS_ZH = {"PASS": "通过", "FAIL": "异常", "REVIEW": "需人工复核", "NA": "不适用"}
 DIM_ZH = {"C内": "表内勾稽", "C间": "表间一致", "C期": "跨期衔接",
           "C附": "主表与附注", "C研": "研报引用"}
+# 研报「待人工复核」条目的原因分类中文名（reason_type 由 src.research_check 产出）。
+# ★ 只做展示映射，不做分桶——分桶唯一由 research_check 决定，避免出现第二个口径。
+REASON_TYPE_ZH = {
+    "NO_MATCH": "未匹配科目/期间",
+    "NO_AMOUNT": "句中无金额",
+    "MULTI_VALUE": "多值枚举",
+    "PREDICTION_NO_ANNUAL_REF": "预测值（无财报对照）",
+    "NO_BASELINE": "缺上期基期",
+    "PERIOD_MISMATCH": "期间/口径不符",
+    "NO_CACHE_OFFLINE": "离线缺缓存（模型未作答）",
+    "未分类": "未分类",
+}
+# 「不计入待复核计数、但必须单列展示」的两桶：(research 字典的键, 展示名, 为何不计入)
+PARKED_BUCKETS = (
+    ("prediction", "预测值（无财报对照）",
+     "研报引用的内容是盈利预测/多列表格行，或同比缺少上一期基期。本系统只依据年报数据、"
+     "不引入外部预测基线，故无对照数据可比，不作判定（不计入待复核计数）。"),
+    ("incomparable", "口径不可比",
+     "研报引用为单季/半年度口径（或期间修饰与匹配期间同时不符），与年度累计口径不可比，"
+     "不作判定（不计入待复核计数）。"),
+)
+_PARKED_REASON_TYPES = tuple(PREDICTION_REASON_TYPES) + tuple(INCOMPARABLE_REASON_TYPES)
 # 提取字段所属报表的中文名与展示顺序（供「按报表分类」渲染）
 STATEMENT_ZH = {"BS": "资产负债表", "IS": "利润表", "CF": "现金流量表",
                 "EQ": "所有者权益变动表", "NOTE": "财务报表附注",
@@ -329,9 +353,29 @@ def _counts(rule_results: list[dict], research: dict) -> dict:
         "research_total": len(rc),
         "research_pass": sum(1 for r in rc if r.get("status") == "PASS"),
         "research_fail": sum(1 for r in rc if r.get("status") == "FAIL"),
-        "research_review": len(research.get("review", [])),
+        # ★ 三个键都走同一过滤函数：review 只计「真·待复核」，另两桶单列计数、不计入。
+        "research_review": len(review_entries(research)),
+        "research_prediction": len(parked_entries(research, "prediction")),
+        "research_incomparable": len(parked_entries(research, "incomparable")),
         "fields": 0,      # 由 caller 填
     }
+
+
+def review_entries(research: dict) -> list[dict]:
+    """研报条目里**计入「待复核」口径**的那些（review 段，排除两个单列桶）。
+
+    ★ 网页、PDF、Excel、HTML 与图形必须共用本函数，禁止各自过滤或各自比较条数——
+      任何一处自行判断，都会造出第二个计数口径。
+    ★ 向后兼容：旧产物的 review 条目没有 reason_type（当时 review 段本就包含全部
+      "判不了"的条目），一律计入，不会让旧运行凭空少掉待复核条目。
+    """
+    return [r for r in (research or {}).get("review") or []
+            if (r or {}).get("reason_type") not in _PARKED_REASON_TYPES]
+
+
+def parked_entries(research: dict, key: str) -> list[dict]:
+    """单列展示的两桶条目（key ∈ "prediction" / "incomparable"）：不计入待复核计数。"""
+    return list((research or {}).get(key) or [])
 
 
 def merged_anomaly_counts(rule_results: list[dict], research: dict) -> tuple[int, int]:
@@ -340,8 +384,8 @@ def merged_anomaly_counts(rule_results: list[dict], research: dict) -> tuple[int
     ★ 必须合并两个数据源，网页与三种报告都调这一个函数：
       - 规则级结果落在 runs/<run_id>/rules/results.json；
       - 研报引用比对结果落在 runs/<run_id>/rules/research_claims.json，
-        其中 results 段是 PASS/FAIL，review 段全部是「程序无法自动判定」的
-        待复核条目（status=REVIEW）。
+        其中 results 段是 PASS/FAIL，review 段是「程序无法自动判定」的待复核条目
+        （status=REVIEW），另有 prediction / incomparable 两桶**不计入**本口径。
       历史上网页只统计前者，于是显示 0，与报告总评的「不一致 3 条、
       待复核 41 条」对不上。计数口径必须单一来源，不得各算各的。
     """
@@ -349,7 +393,8 @@ def merged_anomaly_counts(rule_results: list[dict], research: dict) -> tuple[int
     res = list(rule_results or []) + list(research.get("results") or [])
     # review 段本身就是"程序无法自动判定"的待复核清单，按条数计入即可；
     # 不要求每条都带 status（旧产物/测试造的数据可能没有该字段）。
-    review = list(research.get("review") or [])
+    # ★ 走 review_entries：预测值与口径不可比两桶已单列展示，不计入待复核。
+    review = review_entries(research)
     n_fail = sum(1 for r in res if r.get("status") == "FAIL")
     n_review = sum(1 for r in res if r.get("status") == "REVIEW") + len(review)
     return n_fail, n_review
@@ -402,24 +447,48 @@ def loc_str(ev: dict) -> str:
     return txt
 
 
+def _review_row(x: dict) -> list[str]:
+    """一条待复核/单列条目的表格行（六列，全部格式的报告共用同一列序）。"""
+    return [x.get("item_code") or "—", str(x.get("period") or "—"),
+            x.get("reason", ""), _review_sentence(x), expected_text(x),
+            loc_str(x.get("evidence"))]
+
+
 def research_review_rows(model: dict) -> list[list[str]]:
     """研报引用「待人工复核」条目的表格行：(科目, 期间, 原因, 研报原句, 应为, 位置)。
 
     ★ 只给计数不给明细，评审无从核对到底是哪几句没比对上；报告必须逐条列出。
     ★ 新增「应为」列插在**原句之后、位置之前**：前四列（含原因、原句）的既有下标不变，
       位置仍居末位（报告其它处与测试依赖 0~3 下标）。
+    ★ 只收**计入待复核口径**的条目（见 review_entries）；预测值与口径不可比两桶各自的
+      明细由 research_parked_rows 提供，单列展示、不计入本表。
     """
-    return [[x.get("item_code") or "—", str(x.get("period") or "—"),
-             x.get("reason", ""), _review_sentence(x), expected_text(x),
-             loc_str(x.get("evidence"))]
-            for x in (model.get("research") or {}).get("review") or []]
+    return [_review_row(x) for x in review_entries(model.get("research") or {})]
+
+
+def research_review_groups(model: dict) -> list[tuple[str, list[list[str]]]]:
+    """待复核条目**按 reason_type 分组**：(类别中文名, 表格行)，条数多的排前。
+
+    ★ 给"未匹配科目/期间"、"句中无金额"等分开列：读者才知道每一类**为什么**判不了，
+      而不是笼统一句"程序判不了"。分组名取自 REASON_TYPE_ZH（只做展示映射）。
+    """
+    groups: dict[str, list[list[str]]] = {}
+    for x in review_entries(model.get("research") or {}):
+        zh = REASON_TYPE_ZH.get(x.get("reason_type") or "未分类", "未分类")
+        groups.setdefault(zh, []).append(_review_row(x))
+    return sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+
+
+def research_parked_rows(model: dict, key: str) -> list[list[str]]:
+    """单列展示桶（key ∈ "prediction" / "incomparable"）的表格行，列序与待复核一致。"""
+    return [_review_row(x) for x in parked_entries(model.get("research") or {}, key)]
 
 
 def research_review_reasons(model: dict) -> list[str]:
     """待复核条目的原因分布（按出现次数降序）：「原因：N 条」。"""
     from collections import Counter
     c = Counter(x.get("reason", "") or "（未给出原因）"
-                for x in (model.get("research") or {}).get("review") or [])
+                for x in review_entries(model.get("research") or {}))
     return [f"{reason}：{n} 条" for reason, n in c.most_common()]
 
 
@@ -539,6 +608,21 @@ def build_summary(model: dict) -> list[str]:
             paras.append("本批材料未包含研究报告，或研报引用未匹配到可比字段："
                          "研报引用维度不适用。")
 
+    # ★ 两个单列桶（预测值 / 口径不可比）**不计入待复核计数**，但必须显式说明去向：
+    #   不写一句就少了一批条目，读者会以为它们凭空消失（"不静默丢条目"是硬约束）。
+    rc_pred = c.get("research_prediction", 0)
+    rc_incomp = c.get("research_incomparable", 0)
+    if rc_pred or rc_incomp:
+        detail = []
+        if rc_pred:
+            detail.append(f"{rc_pred} 条为预测值（研报引用的是盈利预测/多列表格行，"
+                          f"或同比缺上一期基期；本系统只用年报数据、不引入外部预测基线，无对照可比）")
+        if rc_incomp:
+            detail.append(f"{rc_incomp} 条为口径不可比（研报引用为单季/半年度口径，"
+                          f"与年度累计口径不可比）")
+        paras.append("另有 " + "；".join(detail) + "。两类均不作判定、"
+                     "不计入待人工复核计数，明细单列于「研报引用」章节，供读者自行判断。")
+
     # ★ 合并口径的核查总评：这是读者唯一应据以判断"本次查到多少问题"的数字，
     #   必须显式拆出两个来源，避免把研报引用的不一致当成"没有异常"。
     paras.append(f"核查总评：异常合计 {total_fail} 条（规则级 {failed} 条 + 研报引用 "
@@ -614,7 +698,9 @@ def build_research_review(model: dict) -> list[str]:
         return []
     fails = [r for r in rc if r.get("status") == "FAIL"]
     passed = [r for r in rc if r.get("status") == "PASS"]
-    review = research.get("review") or []
+    # ★ 只取计入待复核口径的条目（review_entries）；预测值/口径不可比两桶另起一句说明，
+    #   否则点评里的"待人工复核 N 条"会与总评、报告表格计数对不上。
+    review = review_entries(research)
     paras = [f"本批材料共比对研报引用 {len(rc)} 条：一致 {len(passed)} 条、"
              f"不一致 {len(fails)} 条、待人工复核 {len(review)} 条。"]
     for r in fails:
@@ -635,6 +721,11 @@ def build_research_review(model: dict) -> list[str]:
         paras.append("逐条明细（科目 / 期间 / 原因 / 研报原句）在同一章节的表格中列出；"
                      "待复核仅表示程序无法自动判定，不代表存在错误，"
                      "需按原句回到研报与财报原文核对后再定性。")
+    # ★ 两个单列桶必须在此点名，否则读者只看到"待复核 N 条"却不知另有条目未计入。
+    for key, label, why in PARKED_BUCKETS:
+        n = len(parked_entries(research, key))
+        if n:
+            paras.append(f"另有 {n} 条列入「{label}」：{why}明细见同章节对应小节。")
     return paras
 
 
@@ -693,6 +784,8 @@ def render_pdf(model: dict, path: Path) -> Path:
         return t
 
     story = [Paragraph("FinCheck 财报一致性核查报告", h1),
+             Paragraph("——让普通投资者看得懂、查得清：把「研报写的」与「财报实际的」"
+                       "逐条摆在一起核对，并教你识别研报常见错误", small),
              Paragraph(f"运行编号 {model['run_id']} ｜ 生成时间 {model['generated_at']}", small),
              Paragraph("面向投资者的财报与研报一致性核查：把「研报写的」与「财报实际的」"
                        "摆在一起逐条核对，并给出该项应为的正确写法。", small),
@@ -799,9 +892,13 @@ def render_pdf(model: dict, path: Path) -> Path:
     else:
         story.append(Paragraph("本次运行未发现异常。", body))
 
-    # 研报引用异常与待复核：异常逐条给数值，待复核逐条给原因与原句
-    _rv_rows = research_review_rows(model)
-    if model["research_fail"] or _rv_rows:
+    # 研报引用异常与待复核：异常逐条给数值；待复核**按 reason_type 分组**逐条给原因与原句，
+    # 另两个单列桶（预测值 / 口径不可比）各自成节——读者才知道每一条**为什么**没判。
+    _rv_groups = research_review_groups(model)
+    _parked = [(key, label, why, research_parked_rows(model, key))
+               for key, label, why in PARKED_BUCKETS]
+    _parked = [g for g in _parked if g[3]]
+    if model["research_fail"] or _rv_groups or _parked:
         story.append(Paragraph("五、研报引用异常与待人工复核", h2))
         if model["research_fail"]:
             rows = [["科目", "期间", "研报值", "财报值", "差异",
@@ -816,14 +913,23 @@ def render_pdf(model: dict, path: Path) -> Path:
                              loc_str(r.get("evidence"))])
             story.append(tbl(rows, widths=[16 * mm, 14 * mm, 20 * mm, 22 * mm,
                                            12 * mm, 30 * mm, 26 * mm, 25 * mm]))
-        if _rv_rows:
+        if _rv_groups:
+            _rv_n = sum(len(rows) for _zh, rows in _rv_groups)
             story.append(Paragraph(
-                f"待人工复核 {len(_rv_rows)} 条（程序无法自动判定，不代表存在错误）："
+                f"待人工复核 {_rv_n} 条（程序无法自动判定，不代表存在错误）："
                 + "；".join(research_review_reasons(model)), small))
-            rows = [["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"]]
-            rows.extend(_rv_rows)
-            story.append(tbl(rows, widths=[18 * mm, 14 * mm, 38 * mm, 36 * mm,
-                                           34 * mm, 25 * mm]))
+            for _zh, _rows in _rv_groups:
+                story.append(Paragraph(f"{_zh}（{len(_rows)} 条）", h3))
+                story.append(tbl(
+                    [["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"]] + _rows,
+                    widths=[18 * mm, 14 * mm, 38 * mm, 36 * mm, 34 * mm, 25 * mm]))
+            story.append(Spacer(1, 5))
+        for _key, _label, _why, _rows in _parked:
+            story.append(Paragraph(f"{_label}（{len(_rows)} 条，不计入待人工复核计数）", h3))
+            story.append(Paragraph(_esc(_why), small))
+            story.append(tbl(
+                [["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"]] + _rows,
+                widths=[18 * mm, 14 * mm, 38 * mm, 36 * mm, 34 * mm, 25 * mm]))
             story.append(Spacer(1, 5))
 
     # 模型语义审计提示（RC06）：程序规则覆盖不到的语义型问题，由模型不限类型地指出。
@@ -1090,6 +1196,20 @@ def render_xlsx(model: dict, path: Path) -> Path:
                for r in rc])
 
     # 待复核
+    # ★ 研报部分只收**计入待复核口径**的条目（review_entries）；预测值/口径不可比两桶仍在本表内
+    #   追加为独立的「类型」行并显式标注不入计数——单列是为了让读者知道为什么没判，
+    #   但不能让它们凭空消失（"不静默丢条目"），也不改变本表名与列序。
+    def _parked_xlsx_rows() -> list[list]:
+        research = model.get("research") or {}
+        out = []
+        for key, label, _why in PARKED_BUCKETS:
+            kind = f"研报·{label}"
+            for x in parked_entries(research, key):
+                out.append([kind, x.get("claim_id", ""), x.get("reason", ""),
+                            _review_sentence(x), expected_text(x),
+                            loc_str(x.get("evidence"))])
+        return out
+
     sheet("待人工复核", ["类型", "编号/科目", "原因", "原文", "应为（正确值）", "位置"],
           [["规则", r.get("rule_id"), r.get("reason", ""),
             (r.get("evidence") or {}).get("raw_text", ""), expected_text(r),
@@ -1098,7 +1218,8 @@ def render_xlsx(model: dict, path: Path) -> Path:
            if r.get("status") == "REVIEW"]
           + [["研报", x.get("claim_id", ""), x.get("reason", ""), _review_sentence(x),
               expected_text(x), loc_str(x.get("evidence"))]
-             for x in (model.get("research") or {}).get("review", [])])
+             for x in review_entries(model.get("research") or {})]
+          + _parked_xlsx_rows())
 
     # 语义审计提示（RC06）：模型自由审计给出的、程序规则覆盖不到的疑似问题。
     # ★ 独立成表而非并入「待人工复核」：它不计入异常口径，混进去会让计数不可复现。
@@ -1122,7 +1243,8 @@ _HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  h1{{font-size:22px;margin:0 0 4px}} h2{{font-size:16px;margin:28px 0 8px;
    border-left:4px solid #2d6cdf;padding-left:8px}}
  h3{{font-size:14px;margin:14px 0 4px;color:#2d6cdf}}
- .meta{{color:#666;font-size:13px}} .warn{{background:#fff4e5;border:1px solid #ffd08a;
+ .meta{{color:#666;font-size:13px}} .meta.sub{{color:#2d6cdf;font-size:14px;margin:0 0 6px}}
+ .warn{{background:#fff4e5;border:1px solid #ffd08a;
    padding:10px 12px;border-radius:6px;font-size:13px;margin:12px 0}}
  table{{border-collapse:collapse;width:100%;background:#fff;font-size:13px}}
  th,td{{border:1px solid #e3e6ea;padding:6px 8px;text-align:left;vertical-align:top}}
@@ -1134,6 +1256,7 @@ _HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 </style>
 <div class="wrap">
 <h1>FinCheck 财报一致性核查报告</h1>
+<div class="meta sub">——让普通投资者看得懂、查得清：把「研报写的」与「财报实际的」逐条摆在一起核对，并教你识别研报常见错误</div>
 <div class="meta">运行编号 {run_id} ｜ 生成时间 {generated_at} ｜ 报告版本 {report_version}</div>
 <div class="meta">面向投资者的财报与研报一致性核查：把「研报写的」与「财报实际的」摆在一起逐条核对，并给出该项应为的正确写法。</div>
 <div class="warn">{disclaimer}</div>
@@ -1232,9 +1355,13 @@ def render_html(model: dict, path: Path) -> Path:
     else:
         sections.append("<p>本次运行未发现异常。</p>")
 
-    # 研报引用异常与待复核：异常逐条给出数值与归因，待复核逐条给出原因与原句
-    _rv_rows = research_review_rows(model)
-    if model["research_fail"] or _rv_rows:
+    # 研报引用异常与待复核：异常逐条给出数值与归因；待复核**按 reason_type 分组**，
+    # 另两个单列桶（预测值 / 口径不可比）各自成节。
+    _rv_groups = research_review_groups(model)
+    _parked = [(key, label, why, research_parked_rows(model, key))
+               for key, label, why in PARKED_BUCKETS]
+    _parked = [g for g in _parked if g[3]]
+    if model["research_fail"] or _rv_groups or _parked:
         sections.append("<h2>五、研报引用异常与待人工复核</h2>")
         if model["research_fail"]:
             sections.append(_table(
@@ -1247,12 +1374,32 @@ def render_html(model: dict, path: Path) -> Path:
                   f"{r.get('cause','')} {r.get('reason','')}",
                   loc_str(r.get("evidence"))]
                  for r in model["research_fail"]]))
-        if _rv_rows:
-            sections.append(f'<p class="meta">待人工复核 {len(_rv_rows)} 条'
+        if _rv_groups:
+            _rv_n = sum(len(rows) for _zh, rows in _rv_groups)
+            sections.append(f'<p class="meta">待人工复核 {_rv_n} 条'
                             f'（程序无法自动判定，不代表存在错误）：'
                             f'{_esc("；".join(research_review_reasons(model)))}</p>')
-            sections.append(_table(
-                ["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"], _rv_rows))
+            for _zh, _rows in _rv_groups:
+                sections.append(f"<h3>{_esc(_zh)}（{len(_rows)} 条）</h3>" + _table(
+                    ["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"], _rows))
+        for _key, _label, _why, _rows in _parked:
+            sections.append(f"<h3>{_esc(_label)}（{len(_rows)} 条，不计入待人工复核计数）</h3>"
+                            f'<p class="meta">{_esc(_why)}</p>' + _table(
+                                ["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"],
+                                _rows))
+
+    # 「研报常见错误类型科普」：与网页端 expander、对比图同源同色（配色见 src/viz.PALETTE）。
+    # ★ 这一节把作品从"核查工具"扩展为"核查 + 教学"：读者对照上图色块即可学会识别四类错误。
+    try:
+        from src.viz import error_type_cards_html
+        _cards = error_type_cards_html()
+    except Exception:  # noqa: BLE001
+        _cards = ""
+    if _cards:
+        sections.append("<h2>研报常见错误类型科普</h2>"
+                        '<p class="meta">下面四类错误的配色与上方「研报纠错对比图」的'
+                        '"错误类型"列完全一致：图上看到什么颜色，卡片上就是同一类错误。</p>'
+                        + _cards)
 
     # 模型语义审计提示（RC06）：与"异常"分开呈现，性质是提示而非判定
     _au_rows = audit_rows(model)

@@ -251,8 +251,9 @@ def run_match_claim(claims_path: str, records: list[dict], run_id: str, offline:
     enriched, ambiguous = dedup_claim_matches(enriched)
     matched_ids = {m["claim_id"] for m in enriched}
     ambiguous_ids = {a["claim_id"] for a in ambiguous}
-    # 模型漏答的 claim：不猜测，一律进人工复核
+    # 模型漏答的 claim：不猜测，一律进人工复核（reason_type 供报告/网页按类分组展示）
     unmatched = [{"claim_id": c["claim_id"], "reason": "模型未返回该条的匹配结果",
+                  "reason_type": "NO_CACHE_OFFLINE",
                   "sentence": c["sentence"]}
                  for c in claims
                  if c["claim_id"] not in matched_ids
@@ -393,10 +394,13 @@ def run(config_path: str, offline: bool = False, run_id: str = "demo",
     if claims_path and (claim_matches or claim_unmatched):
         rc = run_research_check(claims_path, claim_matches or [], check_records, run_id,
                                 unmatched=claim_unmatched)
-        s_research = "PASS={}/FAIL={}/REVIEW={}".format(
+        # 状态串里的 REVIEW 只算真正计入「待复核」的那一桶；预测值/口径不可比两桶
+        # 单独标注，避免读者把"结构性不可比"误当成"程序判不了"（口径见 research_check 顶部）。
+        s_research = "PASS={}/FAIL={}/REVIEW={}/PRED={}/INCOMP={}".format(
             sum(1 for r in rc["results"] if r["status"] == "PASS"),
             sum(1 for r in rc["results"] if r["status"] == "FAIL"),
-            len(rc["review"]))
+            len(rc["review"]), len(rc.get("prediction") or []),
+            len(rc.get("incomparable") or []))
     # 2c. C研 语义审计（RC06，见 src/semantic_audit.py）：把确定性规则覆盖不到的语义型
     #     问题（同比方向、期间语义、单位量级、研报内部预测表勾稽、单季混用、枚举消歧）
     #     交给模型不限类型地审一遍。结论一律落「待人工复核」，不升级为异常、不改写数字。

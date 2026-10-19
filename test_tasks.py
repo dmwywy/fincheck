@@ -711,7 +711,10 @@ def test_research_check_quarter_vs_annual_is_review_not_fail():
                 "value": "174144069958.25", "page": 63, "chunk_id": "p063_t1"}]
     out = check(matches, claims, records)
     assert out["results"] == []
-    assert out["review"][0]["status"] == "REVIEW"
+    # 单季 vs 年度累计 → 「口径不可比」单列桶（不计入待复核计数）
+    assert out["incomparable"][0]["status"] == "REVIEW"
+    assert out["incomparable"][0]["reason_type"] == "PERIOD_MISMATCH"
+    assert out["review"] == []
 
 
 def test_research_check_passes_within_tolerance():
@@ -741,8 +744,11 @@ def test_research_check_forecast_table_row_is_review_not_fail():
                 "value": "91.2"}]
     out = check(matches, claims, records)
     assert out["results"] == []
-    assert out["review"][0]["status"] == "REVIEW"
-    assert "预测" in out["review"][0]["reason"]
+    # 预测/多列表格行 → 「预测值（无财报对照）」单列桶（不计入待复核计数）
+    assert out["prediction"][0]["status"] == "REVIEW"
+    assert out["prediction"][0]["reason_type"] == "PREDICTION_NO_ANNUAL_REF"
+    assert out["review"] == []
+    assert "预测" in out["prediction"][0]["reason"]
 
 
 def test_research_check_accepts_parent_net_margin_as_same_item():
@@ -807,8 +813,10 @@ def test_research_check_period_mismatch_with_wrong_amount_is_review():
                 "period_type": "BAL_END", "value": "8006739780.94"}]
     out = check(matches, claims, records)
     assert out["results"] == []
-    assert out["review"][0]["status"] == "REVIEW"
-    assert "期间" in out["review"][0]["reason"]
+    # 期间与金额同时对不上 → 「口径不可比」单列桶（不计入待复核计数）
+    assert out["incomparable"][0]["status"] == "REVIEW"
+    assert out["incomparable"][0]["reason_type"] == "PERIOD_MISMATCH"
+    assert "期间" in out["incomparable"][0]["reason"]
 
 
 def test_research_check_flags_yoy_sign_error_as_rc02():
@@ -1056,8 +1064,10 @@ def test_research_check_yoy_without_prior_year_is_review():
                 "value": "172054171890.91"}]
     out = check(matches, claims, records)
     assert [r["rule_id"] for r in out["results"]] == ["RC01@v1.0"]   # 金额本身对得上
-    assert out["review"][0]["rule_id"].startswith("RC02")
-    assert "上一期" in out["review"][0]["reason"]
+    # 缺上期基期 → 「预测值（无财报对照）」单列桶（本系统只用年报、不引外部预期，无基线可比）
+    assert out["prediction"][0]["rule_id"].startswith("RC02")
+    assert out["prediction"][0]["reason_type"] == "NO_BASELINE"
+    assert "上一期" in out["prediction"][0]["reason"]
 
 
 def test_research_check_amount_followed_by_yoy_is_not_enumeration():

@@ -23,22 +23,55 @@ from __future__ import annotations
 
 import math
 
-from src.report import DIM_ZH, expected_text, loc_str, merged_anomaly_counts
+from src.report import (DIM_ZH, expected_text, loc_str, merged_anomaly_counts,
+                        review_entries)
 
 # 维度顺序固定：与 csi.json / report.py 的维度命名一致（C内/C间/C期/C附/C研）
 DIM_ORDER = ("C内", "C间", "C期", "C附", "C研")
 
-# 研报引用错误的归因枚举（定义见 src/research_check.py）
+# ── 单一配色源 ───────────────────────────────────────────────────────────────
+# ★ 图表与「研报常见错误类型科普」卡片必须**同色**：读者在「研报纠错对比图」的
+#   「错误类型」列看到什么颜色，科普卡片上就是同一类错误。所有色值集中在此，
+#   改配色只改这一处（其余模块一律引用 PALETTE / CAUSE_COLOR，不得再写字面量）。
+PALETTE = {
+    "accent": "#2D6CDF",   # 主色：表头、雷达
+    "fail": "#C0392B",     # 异常（确定性结论）
+    "review": "#E0A33C",   # 待人工复核
+    "unit": "#C77C1A",     # 单位量级错误
+    "sign": "#7B4FA0",     # 正负号错误
+    "ink": "#333333",      # 正文文字
+    "muted": "#666666",    # 次要文字
+    "axis": "#9AA3AE",     # 坐标轴
+    "grid": "#D8DCE2",     # 网格线
+    "soft": "#CFE0F7",     # 雷达多边形填充
+    "other": "#5B6B7C",    # 未归类的错误类型
+}
+
+# 研报引用错误的归因枚举（定义见 src/research_check.py）与其主题色。
+# 四类错误各用一个色相：红（数值）/ 琥珀（单位量级）/ 蓝（期间口径）/ 紫（正负号）。
 CAUSE_ZH = {"VALUE_ERROR": "数值错误", "UNIT_SCALE": "单位量级错误",
             "PERIOD_MISMATCH": "期间不符", "SIGN_ERROR": "正负号错误"}
-CAUSE_COLOR = {"VALUE_ERROR": "#C0392B", "UNIT_SCALE": "#B7791F",
-               "PERIOD_MISMATCH": "#2D6CDF", "SIGN_ERROR": "#7B4FA0"}
-CAUSE_OTHER_COLOR = "#5B6B7C"
+CAUSE_COLOR = {"VALUE_ERROR": PALETTE["fail"], "UNIT_SCALE": PALETTE["unit"],
+               "PERIOD_MISMATCH": PALETTE["accent"], "SIGN_ERROR": PALETTE["sign"]}
+CAUSE_OTHER_COLOR = PALETTE["other"]
 
-FAIL_COLOR = "#C0392B"
-REVIEW_COLOR = "#E0A33C"
+FAIL_COLOR = PALETTE["fail"]
+REVIEW_COLOR = PALETTE["review"]
 NA_NOTE = "不适用维度的权重已按比例分摊至其余维度"
 PDF_FONT = "STSong-Light"
+
+# 「研报常见错误类型科普」四张卡片：(归因, 标题, 例子原文, 一句话怎么看)
+# ★ 文案与网页端 expander、HTML 报告共用同一份，禁止两处各写一套。
+ERROR_TYPE_CARDS = (
+    ("SIGN_ERROR", "正负号错误", "研报写「同比 +1.2%」，实为 -1.2%",
+     "先看数字前有没有负号被吞掉：方向词（增长 / 减少）与正负号必须一致。"),
+    ("UNIT_SCALE", "单位量级错误", "「1721 千万元」≠「1721 亿元」",
+     "看单位：千万元与亿元差 10 倍，量级单位写错会让金额整体偏移。"),
+    ("PERIOD_MISMATCH", "期间错误", "「2026 年 6 月末」≠「2025 年末」",
+     "对不上年度就存疑：期间写错时金额常常是对的，纯数值比对抓不到。"),
+    ("VALUE_ERROR", "数值错误", "研报写 232 亿元，财报实为 222.75 亿元",
+     "和年报原文逐位比对：这是最直接的一类，逐位核对即可发现。"),
+)
 
 
 # ---------------- 数据组装（不含任何计算） ----------------
@@ -69,8 +102,10 @@ def anomaly_by_dimension(rule_results: list[dict], research: dict) -> dict[str, 
             _bump(r.get("dimension"), "fail")
         elif status == "REVIEW":
             _bump(r.get("dimension"), "review")
-    # review 段：整段视为待复核，维度缺省按研报维度 C研 计
-    for r in list(research.get("review") or []):
+    # review 段：整段视为待复核，维度缺省按研报维度 C研 计。
+    # ★ 走 review_entries 与报告/网页共用同一过滤（排除已单列的预测值、口径不可比两桶），
+    #   否则图上合计会与 merged_anomaly_counts 对不上——那就是第二个计数口径。
+    for r in review_entries(research):
         _bump((r or {}).get("dimension") or "C研", "review")
     return out
 
@@ -118,6 +153,51 @@ def _short(text, n: int = 46) -> str:
     return s if len(s) <= n else s[:n - 1] + "…"
 
 
+# ---------------- 科普卡片（网页端 expander 与 HTML 报告共用同一份文案） ----------------
+
+def _tint(hex_color: str, keep: float = 0.12) -> str:
+    """色值混白得到同源淡色底：卡片底色与图上浓色属于**同一色系**，只是明度更浅。"""
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    mix = lambda v: int(round(v * keep + 255 * (1 - keep)))          # noqa: E731
+    return f"#{mix(r):02X}{mix(g):02X}{mix(b):02X}"
+
+
+def _rgba(hex_color: str, alpha: float) -> str:
+    """色值 → rgba(...)：Plotly 的填充色要透明度时用（与描边同源，保持同色系）。"""
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return f"rgba({r},{g},{b},{alpha})"
+
+
+def error_type_cards_html() -> str:
+    """「研报常见错误类型科普」四张卡片（自包含 HTML，含样式）。
+
+    ★ 卡片主色直接取 ``CAUSE_COLOR`` —— 与「研报纠错对比图」里同类错误的色块**同源**，
+      读者在图上看到红色就是数值错误、琥珀色就是单位量级错误，无需再看图例。
+    ★ 自包含：样式随片段一起下发，网页端 ``st.markdown`` 与 HTML 报告都能直接内嵌。
+    """
+    cards = []
+    for cause, title, example, tip in ERROR_TYPE_CARDS:
+        c = CAUSE_COLOR.get(cause, CAUSE_OTHER_COLOR)
+        cards.append(
+            f'<div class="fec-card" style="border-left:5px solid {c};'
+            f'background:{_tint(c)}">'
+            f'<div class="fec-head" style="color:{c}">{title}</div>'
+            f'<div class="fec-ex">{example}</div>'
+            f'<div class="fec-tip">{tip}</div></div>')
+    return (
+        '<style>'
+        '.fec-wrap{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 2px}'
+        '.fec-card{flex:1 1 240px;border-radius:8px;padding:10px 12px}'
+        '.fec-head{font-weight:700;font-size:14px;margin-bottom:5px}'
+        f'.fec-ex{{font-family:Consolas,Menlo,monospace;font-size:13px;'
+        f'color:{PALETTE["ink"]};margin-bottom:5px}}'
+        f'.fec-tip{{font-size:12px;color:{PALETTE["other"]};line-height:1.55}}'
+        '</style>'
+        '<div class="fec-wrap">' + "".join(cards) + '</div>')
+
+
 # ---------------- Plotly（网页端 / HTML 报告） ----------------
 
 def _go():
@@ -150,15 +230,15 @@ def csi_radar(csi: dict):
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
         r=scores + [scores[0]], theta=labels + [labels[0]], fill="toself",
-        name="维度得分", line=dict(color="#2D6CDF", width=2),
-        fillcolor="rgba(45,108,223,0.18)",
+        name="维度得分", line=dict(color=PALETTE["accent"], width=2),
+        fillcolor=_rgba(PALETTE["accent"], 0.18),
         hovertemplate="%{theta}<br>得分 %{r}<extra></extra>"))
     if na_keys:
         # 不适用维度画在原点并单独成一条图例，避免被误读成「得分为 0 的不合格维度」
         fig.add_trace(go.Scatterpolar(
             r=[0] * len(na_keys), theta=[labels[keys.index(k)] for k in na_keys],
             mode="markers", name="不适用（权重已分摊）",
-            marker=dict(color="#8A93A0", size=10, symbol="x"),
+            marker=dict(color=PALETTE["axis"], size=10, symbol="x"),
             hovertemplate="%{theta}<br>不适用<extra></extra>"))
     fig.update_layout(
         **_LAYOUT,
@@ -208,7 +288,7 @@ def anomaly_distribution(rule_results: list[dict], research: dict, csi: dict | N
         annotations=[dict(
             text=f"合计：异常 {n_fail} 条 / 待复核 {n_review} 条（与报告总评同源）",
             xref="paper", yref="paper", x=1, y=1.12, xanchor="right", yanchor="top",
-            showarrow=False, font=dict(size=11, color="#5B6B7C"))])
+            showarrow=False, font=dict(size=11, color=PALETTE["other"]))])
     return fig
 
 
@@ -221,21 +301,22 @@ def research_error_compare(research: dict):
     n = len(rows)
     fills = [
         [CAUSE_COLOR.get(r["cause"], CAUSE_OTHER_COLOR) for r in rows],  # 错误类型：色块即标签
-        ["#FDECEA"] * n,                                                # 研报写的：红底
-        ["#E9F7EF"] * n,                                                # 应为：绿底
+        [_tint(PALETTE["fail"], 0.08)] * n,                             # 研报写的：异常色淡底
+        [_tint("#1E7A46", 0.10)] * n,                                   # 应为：绿淡底
         ["#FFFFFF"] * n,
     ]
     fig = go.Figure(go.Table(
         columnwidth=[96, 300, 260, 210],
         header=dict(values=["错误类型", "研报写的（研报原文值）", "应为（正确值）", "位置"],
-                    fill_color="#2D6CDF", align="left", height=30,
+                    fill_color=PALETTE["accent"], align="left", height=30,
                     font=dict(color="#FFFFFF", size=12)),
         cells=dict(values=[[r["cause_zh"] for r in rows],
                            [_short(r["written"]) for r in rows],
                            [_short(r["should"]) for r in rows],
                            [_short(r["location"], 40) for r in rows]],
                    fill_color=fills, align="left", height=30,
-                   font=dict(size=11, color=["#FFFFFF", "#333333", "#1E7A46", "#666666"]))))
+                   font=dict(size=11, color=["#FFFFFF", PALETTE["ink"], "#1E7A46",
+                                             PALETTE["muted"]]))))
     fig.update_layout(
         **_LAYOUT,
         title=dict(text="研报纠错对比：研报写的 → 应为（正确值）", font=dict(size=14),
@@ -308,10 +389,10 @@ def csi_radar_drawing(csi: dict, width: float = 330, height: float = 260):
     n = len(items)
     cx, cy = width / 2.0, height / 2.0 - 6
     radius = min(width, height) * 0.33
-    grid = colors.HexColor("#D8DCE2")
+    grid = colors.HexColor(PALETTE["grid"])
     d = Drawing(width, height)
     d.add(String(cx, height - 13, "一致性维度雷达图", fontName=font, fontSize=9.5,
-                 textAnchor="middle", fillColor=colors.HexColor("#333333")))
+                 textAnchor="middle", fillColor=colors.HexColor(PALETTE["ink"])))
     for frac in (0.2, 0.4, 0.6, 0.8, 1.0):
         pts = []
         for i in range(n):
@@ -329,8 +410,8 @@ def csi_radar_drawing(csi: dict, width: float = 330, height: float = 260):
         a = math.radians(90 - i * 360.0 / n)
         r = radius * (0.0 if s is None else s)
         pts += [cx + r * math.cos(a), cy + r * math.sin(a)]
-    d.add(Polygon(pts, strokeColor=colors.HexColor("#2D6CDF"), strokeWidth=1.4,
-                  fillColor=colors.HexColor("#CFE0F7")))
+    d.add(Polygon(pts, strokeColor=colors.HexColor(PALETTE["accent"]), strokeWidth=1.4,
+                  fillColor=colors.HexColor(PALETTE["soft"])))
     for i, (k, s) in enumerate(items):
         a = math.radians(90 - i * 360.0 / n)
         lx = cx + radius * 1.2 * math.cos(a)
@@ -338,12 +419,13 @@ def csi_radar_drawing(csi: dict, width: float = 330, height: float = 260):
         label = (f"{DIM_ZH.get(k, k)}（不适用）" if s is None
                  else f"{DIM_ZH.get(k, k)} {s * 100:.0f}")
         d.add(String(lx, ly - 3, label, fontName=font, fontSize=7.5, textAnchor="middle",
-                     fillColor=colors.HexColor("#8A93A0" if s is None else "#333333")))
+                     fillColor=colors.HexColor(
+                         PALETTE["axis"] if s is None else PALETTE["ink"])))
     foot = f"CSI {csi.get('csi')}（等级 {csi.get('grade', '')}）"
     if na_keys:
         foot += f"；{'、'.join(na_keys)} 不适用，{NA_NOTE}"
     d.add(String(cx, 5, foot, fontName=font, fontSize=7, textAnchor="middle",
-                 fillColor=colors.HexColor("#666666")))
+                 fillColor=colors.HexColor(PALETTE["muted"])))
     return d
 
 
@@ -369,16 +451,16 @@ def anomaly_distribution_drawing(rule_results: list[dict], research: dict,
     scale = (y1 - y0) / float(top)
     step = (x1 - x0) / float(len(rows))
     bar_w = min(26.0, step * 0.5)
-    axis = colors.HexColor("#9AA3AE")
+    axis = colors.HexColor(PALETTE["axis"])
     d = Drawing(width, height)
     d.add(String(x0, height - 12, "异常分布（按一致性维度）", fontName=font, fontSize=9.5,
-                 fillColor=colors.HexColor("#333333")))
+                 fillColor=colors.HexColor(PALETTE["ink"])))
     d.add(Line(x0, y0, x0, y1, strokeColor=axis, strokeWidth=0.6))
     d.add(Line(x0, y0, x1, y0, strokeColor=axis, strokeWidth=0.6))
     d.add(String(x0 - 3, y1 - 8, str(top), fontName=font, fontSize=7, textAnchor="end",
-                 fillColor=colors.HexColor("#666666")))
+                 fillColor=colors.HexColor(PALETTE["muted"])))
     d.add(String(x0 - 3, y0 - 3, "0", fontName=font, fontSize=7, textAnchor="end",
-                 fillColor=colors.HexColor("#666666")))
+                 fillColor=colors.HexColor(PALETTE["muted"])))
     for i, r in enumerate(rows):
         cxi = x0 + step * (i + 0.5)
         h_fail = r["fail"] * scale
@@ -391,19 +473,19 @@ def anomaly_distribution_drawing(rule_results: list[dict], research: dict,
                        fillColor=colors.HexColor(REVIEW_COLOR), strokeColor=None))
         d.add(String(cxi, y0 + h_fail + h_rev + 3, f"{r['fail']} / {r['review']}",
                      fontName=font, fontSize=7, textAnchor="middle",
-                     fillColor=colors.HexColor("#333333")))
+                     fillColor=colors.HexColor(PALETTE["ink"])))
         d.add(String(cxi, y0 - 11, r["dimension"], fontName=font, fontSize=7.5,
-                     textAnchor="middle", fillColor=colors.HexColor("#333333")))
+                     textAnchor="middle", fillColor=colors.HexColor(PALETTE["ink"])))
         d.add(String(cxi, y0 - 20, r["label"], fontName=font, fontSize=6.5,
-                     textAnchor="middle", fillColor=colors.HexColor("#888888")))
+                     textAnchor="middle", fillColor=colors.HexColor(PALETTE["muted"])))
     d.add(Rect(x0, height - 29, 8, 8, fillColor=colors.HexColor(FAIL_COLOR), strokeColor=None))
     d.add(String(x0 + 11, height - 28, "异常（确定性）", fontName=font, fontSize=7,
-                 fillColor=colors.HexColor("#333333")))
+                 fillColor=colors.HexColor(PALETTE["ink"])))
     d.add(Rect(x0 + 78, height - 29, 8, 8, fillColor=colors.HexColor(REVIEW_COLOR),
                strokeColor=None))
     d.add(String(x0 + 89, height - 28, "待人工复核", fontName=font, fontSize=7,
-                 fillColor=colors.HexColor("#333333")))
+                 fillColor=colors.HexColor(PALETTE["ink"])))
     d.add(String(x1, height - 28, f"合计：异常 {n_fail} / 待复核 {n_review}",
                  fontName=font, fontSize=7, textAnchor="end",
-                 fillColor=colors.HexColor("#666666")))
+                 fillColor=colors.HexColor(PALETTE["muted"])))
     return d

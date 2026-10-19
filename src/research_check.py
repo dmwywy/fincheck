@@ -26,6 +26,16 @@ RULE_ID = "RC01@v1.0"          # 研报引用一致性：一条规则，多个�
 YOY_RULE_ID = "RC02@v1.0"      # 研报引用同比核验：同上，只在不符时产出结果
 TOLERANCE_PROFILE = "REPORT_REF"
 
+# 「待人工复核」条目的原因分类（reason_type）。程序判不了不等于都一回事——报告与网页
+# 按此分组展示，读者才知道每一条**为什么**没判。三个落点：
+#   review       —— 计入「待复核」计数：未匹配科目/期间、句中无金额、多值枚举、离线未作答；
+#   prediction   —— 「预测值（无财报对照）」：预测/多列表格行，以及同比缺上期基期
+#                   （本系统只用年报、不引外部预期，见 derived.py 铁律 1，无基线可比）；
+#   incomparable —— 「口径不可比」：单季/半年度 vs 年度累计，期间修饰与匹配期间同时不符。
+# ★ 落点只在本模块产出、由 src.report 的计数与展示统一消费，禁止各处自行分桶。
+PREDICTION_REASON_TYPES = ("PREDICTION_NO_ANNUAL_REF", "NO_BASELINE")
+INCOMPARABLE_REASON_TYPES = ("PERIOD_MISMATCH",)
+
 # 金额+单位 → 换算到"元"的乘数。键为**合法**单位写法。
 UNIT_SCALE = {
     "万亿": Decimal("1000000000000"),
@@ -864,13 +874,13 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
 
         # 缺科目/期间 → 无法比对，转人工复核（不猜）
         if not code or not period:
-            skipped.append({**base, "status": "REVIEW",
+            skipped.append({**base, "status": "REVIEW", "reason_type": "NO_MATCH",
                             "reason": "未匹配到科目或期间，无法比对"})
             continue
 
         recs = idx.get((code, period))
         if not recs:
-            skipped.append({**base, "status": "REVIEW",
+            skipped.append({**base, "status": "REVIEW", "reason_type": "NO_MATCH",
                             "reason": f"结构化数据中无 {code}@{period}，需数据侧确认"})
             continue
 
@@ -885,6 +895,7 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
         #   只能如实转人工复核，不猜、不补。
         if is_forecast_row(sentence):
             skipped.append({**base, "status": "REVIEW",
+                            "reason_type": "PREDICTION_NO_ANNUAL_REF",
                             "reason": "研报为预测/多列表格行：列头年份已丢失，且预测类指标"
                                       "（含调整幅度）需上一版预测基线，无法确定性核验，"
                                       "需人工复核"})
@@ -893,7 +904,7 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
         # 期间不许混（interfaces.md §1.5）：研报写的是单季/半年度数，财报记录是全年累计，
         # 两者不可比。直接判不可比而不是判错——否则每句"Q4实现…"都会变成一条误报。
         if QUARTER_RE.search(sentence) and rec.get("period_type") == "FY":
-            skipped.append({**base, "status": "REVIEW",
+            skipped.append({**base, "status": "REVIEW", "reason_type": "PERIOD_MISMATCH",
                             "reason": "研报为单季/半年度口径，与年度累计不可比"})
             continue
 
@@ -904,12 +915,12 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
             figs = (associate_percent(sentence, zh_map) if code in RATIO_CODES
                     else associate_figures(sentence, zh_map))
         except Exception as e:                                  # noqa: BLE001
-            skipped.append({**base, "status": "REVIEW",
+            skipped.append({**base, "status": "REVIEW", "reason_type": "NO_AMOUNT",
                             "reason": f"句内金额解析异常（{type(e).__name__}: {e}），需人工复核"})
             continue
         fig = figs.get(code)
         if not fig:
-            skipped.append({**base, "status": "REVIEW",
+            skipped.append({**base, "status": "REVIEW", "reason_type": "NO_AMOUNT",
                             "reason": "句中该指标名下未定位到金额（或该指标非本句主语），需人工复核"})
             continue
 
@@ -917,7 +928,7 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
         # NUM_RE 只截得到末位「982 亿元」（实为 2028E），拿它去比 2025 年财报必然张冠李戴，
         # 凭空产出一条误报。转人工复核，不猜。
         if fig.get("enumerated"):
-            skipped.append({**base, "status": "REVIEW",
+            skipped.append({**base, "status": "REVIEW", "reason_type": "MULTI_VALUE",
                             "reason": f"研报为多值枚举（{fig['raw']}），无法判定哪一个是"
                                       f"本期间（{period}）的数值，需人工复核"})
             continue
@@ -953,7 +964,7 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
                           f"{period} 期间（金额本身一致）——期写错、数却对，属期间张冠李戴。"
                           f"应写作 {period_year} 年。")
             else:
-                skipped.append({**base, "status": "REVIEW",
+                skipped.append({**base, "status": "REVIEW", "reason_type": "PERIOD_MISMATCH",
                                 "reason": f"研报表述期间为 {period_year} 年，与匹配期间 "
                                           f"{period} 不一致且金额亦不符，疑为期间匹配错误，"
                                           f"需人工复核"})
@@ -1015,11 +1026,13 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
                     # 留痕。此前这里是静默跳过：研报把同比方向写反，报告上完全看不见——
                     # 那正是"正负号漏报"的结构性温床。
                     skipped.append({**yoy_base, "status": "REVIEW",
+                                    "reason_type": "NO_BASELINE",
                                     "reason": f"研报标注了同比（{yoy_raw}），但财报侧缺少"
                                               f"上一期（上一年度）数据，方向与幅度无法核验，"
                                               f"需人工复核"})
                 elif yoy_enumerated:
                     skipped.append({**yoy_base, "status": "REVIEW",
+                                    "reason_type": "MULTI_VALUE",
                                     "reason": f"研报同比为多值枚举（{yoy_raw}），无法判定"
                                               f"本期间（{period}）口径，需人工复核"})
                 else:
@@ -1043,6 +1056,7 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
                                             "expected": f"{_num_str(truth_yoy)}%"})
                         else:
                             skipped.append({**yoy_base, "status": "REVIEW",
+                                            "reason_type": "NO_MATCH",
                                             "reason": f"研报同比 {yoy_raw} 与财报口径同比 "
                                                       f"{truth_yoy}% 不符，需人工复核",
                                             "expected": f"{_num_str(truth_yoy)}%"})
@@ -1058,9 +1072,23 @@ def check(matches: list[dict], claims_by_id: dict, records: list[dict]) -> dict:
     # ② 已判为异常（FAIL）的 claim 不再重复进「待人工复核」清单：同一处问题既进 FAIL
     #    又进 REVIEW，会让异常计数翻倍、复核清单出现伪条目（如"该 claim 无结构化数据"
     #    这类伪条目，在该 claim 已判出真异常时毫无信息增量）。
+    # ③ 剩下的「判不了」按 reason_type 落三桶（见文件顶部 PREDICTION/INCOMPARABLE 常量）：
+    #    只有 review 桶计入「待复核」计数；另两桶单列展示、不计入，避免把"预测值本就没
+    #    财报可比""单季与年度口径不可比"这两类**结构性不可比**混进"程序判不了"里。
     failed = {r.get("claim_id") for r in results if r.get("status") == "FAIL"}
-    return {"results": results,
-            "review": [r for r in skipped if r.get("claim_id") not in failed]}
+    review, prediction, incomparable = [], [], []
+    for r in skipped:
+        if r.get("claim_id") in failed:
+            continue
+        rt = r.get("reason_type")
+        if rt in PREDICTION_REASON_TYPES:
+            prediction.append(r)
+        elif rt in INCOMPARABLE_REASON_TYPES:
+            incomparable.append(r)
+        else:
+            review.append(r)
+    return {"results": results, "review": review,
+            "prediction": prediction, "incomparable": incomparable}
 
 
 def dedup_claim_matches(matches: list[dict]) -> tuple[list[dict], list[dict]]:
@@ -1102,6 +1130,7 @@ def dedup_claim_matches(matches: list[dict]) -> tuple[list[dict], list[dict]]:
             else:
                 demoted.append({
                     "claim_id": cid, "item_code": code, "period": None,
+                    "reason_type": "PERIOD_MISMATCH",
                     "reason": "同句命中多个期间且句中无对应年份，期间无法对齐，转人工复核",
                     "sentence": sentence,
                 })
@@ -1122,15 +1151,26 @@ def run_research_check(claims_path: str, matches: list[dict],
     # 已被研报内检测器（RC03/RC04/RC05）判定为异常的 claim，不再重复记为「待复核」：
     # 同一处植错若既进 FAIL 又进 REVIEW，异常计数会翻倍、复核清单也会出现伪条目。
     decided = {r.get("claim_id") for r in out["results"]}
+    # 「模型压根没作答」与「同句多期间无法对齐」也按 reason_type 落桶：后者在
+    # dedup_claim_matches 已标 PERIOD_MISMATCH，必须与 check() 内产出的口径一致，
+    # 否则同一类条目会一半在 review、一半在 incomparable，计数口径就分裂了。
+    def _bucket(rt: str) -> str:
+        if rt in PREDICTION_REASON_TYPES:
+            return "prediction"
+        if rt in INCOMPARABLE_REASON_TYPES:
+            return "incomparable"
+        return "review"
+
     for u in unmatched or []:
         cid = u.get("claim_id")
         if cid in decided:
             continue
         c = by_id.get(cid) or {}
-        out["review"].append({
+        rt = u.get("reason_type") or "NO_CACHE_OFFLINE"
+        out[_bucket(rt)].append({
             "rule_id": RULE_ID, "dimension": "C研", "claim_id": cid,
             "item_code": u.get("item_code"), "period": u.get("period"),
-            "status": "REVIEW",
+            "status": "REVIEW", "reason_type": rt,
             "reason": u.get("reason") or "模型未返回该条的匹配结果",
             # 位置：页码 + 章节 + 段号 / 表行号 + 表标题（与 RC01 证据口径一致）
             "evidence": {"file": c.get("source"), "section": c.get("section"),

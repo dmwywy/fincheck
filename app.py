@@ -16,8 +16,10 @@ import streamlit as st
 
 # CSI 口径提示：与报告三格式共用同一份文案，避免"满分 = 全部维度通过"的误导
 # 「异常 / 待复核」计数同样与报告总评同源，见 src.report.merged_anomaly_counts
-from src.report import (_csi_caveat, _csi_exec_note, expected_text, loc_str,
-                        merged_anomaly_counts, unprocessed_entries)
+from src.report import (PARKED_BUCKETS, _csi_caveat, _csi_exec_note, expected_text,
+                        loc_str, merged_anomaly_counts,
+                        research_parked_rows, research_review_groups, review_entries,
+                        unprocessed_entries)
 
 ROOT = Path(__file__).resolve().parent
 STATUS_ZH = {"PASS": "通过", "FAIL": "异常", "REVIEW": "需人工复核", "NA": "不适用"}
@@ -43,8 +45,10 @@ def list_runs() -> list[str]:
 
 
 st.title("FinCheck · 财报一致性核查智能体")
+st.markdown("##### 让普通投资者看得懂、查得清：逐条核对研报与财报，并教你识别研报常见错误")
 st.caption("把研报与财报摆在一起逐条对：程序按确定性规则核对表内勾稽、跨期衔接与研报引用，"
-          "指出「研报写的」与「财报实际的」差在哪里、该项应为的正确写法。")
+          "指出「研报写的」与「财报实际的」差在哪里、该项应为的正确写法；"
+          "并教你识别研报常见的四类错误（正负号、单位量级、期间、数值）。")
 st.warning(DISCLAIMER)
 
 with st.container(border=True):
@@ -200,8 +204,14 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(
 # ---- ① 异常清单 ----
 with tab1:
     rf = [x for x in research.get("results", []) if x.get("status") == "FAIL"]
-    rv = list(research.get("review") or [])
-    if not anomalies and not rf and not rv:
+    # ★ 只取**计入待复核口径**的条目（review_entries），与指标卡、报告总评同一过滤；
+    #   预测值/口径不可比两桶单列展示、不计入计数（见下）。
+    rv = review_entries(research)
+    _rv_groups = research_review_groups({"research": research})
+    _parked = [(key, label, why, research_parked_rows({"research": research}, key))
+               for key, label, why in PARKED_BUCKETS]
+    _parked = [g for g in _parked if g[3]]
+    if not anomalies and not rf and not rv and not _parked:
         st.success("本次运行未发现异常。")
     else:
         for r in anomalies:
@@ -240,20 +250,25 @@ with tab1:
             "位置": loc_str(x.get("evidence")),
         } for x in rf]), width='stretch')
 
+    _RV_COLS = ["科目", "期间", "原因", "研报原句", "应为（正确值）", "位置"]
     if rv:
         st.subheader(f"研报引用待人工复核（{len(rv)} 条）")
-        st.caption("程序无法自动判定，不代表存在错误。这些条目同样计入上方的"
-                   "「异常 / 待复核」指标卡，与报告总评口径一致。")
+        st.caption("程序无法自动判定，不代表存在错误。这些条目计入上方的"
+                   "「异常 / 待复核」指标卡，与报告总评口径一致；"
+                   "下面按**程序为什么判不了**分组列出，便于逐类核对。")
         _reasons = pd.Series([x.get("reason", "") for x in rv]).value_counts()
         st.dataframe(pd.DataFrame({
             "原因": _reasons.index, "条数": _reasons.values}), width='stretch', hide_index=True)
-        st.dataframe(pd.DataFrame([{
-            "科目": x.get("item_code") or "—", "期间": x.get("period") or "—",
-            "原因": x.get("reason", ""),
-            "研报原句": (x.get("evidence") or {}).get("sentence") or "—",
-            "应为（正确值）": expected_text(x),
-            "位置": loc_str(x.get("evidence")),
-        } for x in rv]), width='stretch', hide_index=True)
+        for _zh, _rows in _rv_groups:
+            with st.expander(f"{_zh}（{len(_rows)} 条）", expanded=len(_rows) >= 5):
+                st.dataframe(pd.DataFrame(_rows, columns=_RV_COLS),
+                             width='stretch', hide_index=True)
+
+    # 两个单列桶：**不计入待复核计数**，但必须显式展示，否则读者以为条目凭空消失。
+    for _key, _label, _why, _rows in _parked:
+        st.subheader(f"{_label}（{len(_rows)} 条，不计入待复核计数）")
+        st.caption(_why)
+        st.dataframe(pd.DataFrame(_rows, columns=_RV_COLS), width='stretch', hide_index=True)
 
     # 模型语义审计提示（RC06）：程序规则覆盖不到的语义型问题，由模型不限类型地指出。
     # ★ 与上方异常分开呈现：这些结论不可复现，是"提示"而非"判定"，不计入异常口径。
@@ -285,7 +300,8 @@ with tab2:
               help="成功参与字段提取与核查的上传文件数，不含未识别 / 处理失败 / 未抽出内容的文件。")
 
     # ---- 核查图表（与报告三端同源；只做呈现，不做数值计算） ----
-    from src.viz import anomaly_distribution, csi_radar, research_error_compare
+    from src.viz import (anomaly_distribution, csi_radar, error_type_cards_html,
+                         research_error_compare)
     dims = csi.get("dimensions") or {}
     st.subheader("核查图表")
     _fig_r, _fig_d = csi_radar(csi), anomaly_distribution(results, research, csi)
@@ -304,6 +320,11 @@ with tab2:
         st.plotly_chart(_fig_e, key="viz_err")
         st.caption("「研报写的」= 研报原文值；「应为（正确值）」= 系统核出的正确写法"
                    "（无确定性结论时为「—」）。过长原文已截断，完整原文与证据定位见①异常清单。")
+
+    # 「研报常见错误类型科普」：卡片配色与上方对比图的「错误类型」列同源（见 src.viz.PALETTE）。
+    # ★ 这一块把作品从"核查工具"扩展为"核查 + 教学"，直接点题智慧教育。
+    with st.expander("教你识别研报常见错误（四类错误的识别要点）", expanded=False):
+        st.markdown(error_type_cards_html(), unsafe_allow_html=True)
 
     st.divider()
     if not dims:
