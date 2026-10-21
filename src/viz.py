@@ -45,12 +45,13 @@ PALETTE = {
     "grid": "#D8DCE2",     # 网格线
     "soft": "#CFE0F7",     # 雷达多边形填充
     "other": "#5B6B7C",    # 未归类的错误类型
+    "ok": "#1E7A46",       # 「应为（正确值）」列的文字与淡底
 }
 
 # 研报引用错误的归因枚举（定义见 src/research_check.py）与其主题色。
 # 四类错误各用一个色相：红（数值）/ 琥珀（单位量级）/ 蓝（期间口径）/ 紫（正负号）。
 CAUSE_ZH = {"VALUE_ERROR": "数值错误", "UNIT_SCALE": "单位量级错误",
-            "PERIOD_MISMATCH": "期间不符", "SIGN_ERROR": "正负号错误"}
+            "PERIOD_MISMATCH": "期间错误", "SIGN_ERROR": "正负号错误"}
 CAUSE_COLOR = {"VALUE_ERROR": PALETTE["fail"], "UNIT_SCALE": PALETTE["unit"],
                "PERIOD_MISMATCH": PALETTE["accent"], "SIGN_ERROR": PALETTE["sign"]}
 CAUSE_OTHER_COLOR = PALETTE["other"]
@@ -60,17 +61,61 @@ REVIEW_COLOR = PALETTE["review"]
 NA_NOTE = "不适用维度的权重已按比例分摊至其余维度"
 PDF_FONT = "STSong-Light"
 
-# 「研报常见错误类型科普」四张卡片：(归因, 标题, 例子原文, 一句话怎么看)
-# ★ 文案与网页端 expander、HTML 报告共用同一份，禁止两处各写一套。
+# 「研报常见错误类型科普」四张卡片。文案与网页端、HTML 报告共用同一份，禁止两处各写一套。
+# 每类给足内容：一句话定义、常见成因、怎么识别、本次实例、术语，点开后按大卡片展示。
 ERROR_TYPE_CARDS = (
-    ("SIGN_ERROR", "正负号错误", "研报写「同比 +1.2%」，实为 -1.2%",
-     "先看数字前有没有负号被吞掉：方向词（增长 / 减少）与正负号必须一致。"),
-    ("UNIT_SCALE", "单位量级错误", "「1721 千万元」≠「1721 亿元」",
-     "看单位：千万元与亿元差 10 倍，量级单位写错会让金额整体偏移。"),
-    ("PERIOD_MISMATCH", "期间错误", "「2026 年 6 月末」≠「2025 年末」",
-     "对不上年度就存疑：期间写错时金额常常是对的，纯数值比对抓不到。"),
-    ("VALUE_ERROR", "数值错误", "研报写 232 亿元，财报实为 222.75 亿元",
-     "和年报原文逐位比对：这是最直接的一类，逐位核对即可发现。"),
+    {"cause": "SIGN_ERROR", "title": "正负号错误",
+     "subtitle": "方向写反：增长被写成下降",
+     "example": "研报写「同比 +1.2%」，实为 -1.2%",
+     "definition": "研报在引用增速、变动额或方向性描述时，把正负号写反或漏写。"
+                   "金额本身可能完全对得上，只有方向错了，所以逐位比对时最容易被忽略。",
+     "causes": ("从表格复制时丢了负号：-1.2% 变成 1.2%",
+                "方向词与数值不一致：写「减少 / 下降」却配正数",
+                "跨行跨列取数时，把相邻项目的符号带了过来"),
+     "howto": ("先看数字带不带负号，再看前面的方向词是增长还是下降",
+               "变动额的符号要跟「增加 / 减少」一致：利润下滑时应为负数",
+               "同一指标本期与上期的方向应能互相印证"),
+     "tip": "先看数字前有没有负号被吞掉：方向词（增长 / 减少）与正负号必须一致。",
+     "term": "同比：本期与上年同期相比的变化幅度，通常用百分比表示。"},
+    {"cause": "UNIT_SCALE", "title": "单位量级错误",
+     "subtitle": "单位差 10 倍：千万元当成亿元",
+     "example": "「1721 千万元」≠「1721 亿元」",
+     "definition": "数值本身没错，但单位（元 / 千元 / 万元 / 千万元 / 亿元）写错或漏写，"
+                   "使金额整体偏移 10 倍、100 倍甚至上万倍。",
+     "causes": ("原文是「万元」，转写时改成了「亿元」",
+                "表头或表注的单位行被漏读，默认按「元」处理",
+                "中英文单位混用：million 与亿元混算"),
+     "howto": ("先确认单位行：表头或表注写的是元、万元还是亿元",
+               "千万元与亿元差 10 倍，万元与亿元差 10000 倍",
+               "用同表其它科目做量级校验：营业收入与总资产不会处于同一量级"),
+     "tip": "看单位：千万元与亿元差 10 倍，量级单位写错会让金额整体偏移。",
+     "term": "量级单位：元 < 千元 < 万元 < 千万元 < 亿元，相邻两级相差 10~1000 倍。"},
+    {"cause": "PERIOD_MISMATCH", "title": "期间错误",
+     "subtitle": "时点错位：季度数当成年报数",
+     "example": "「2026 年 6 月末」≠「2025 年末」",
+     "definition": "引用的数字属于另一个报告期：把单季或半年度数当年报累计数、把上年末数当"
+                   "本年末数，或把预测年度当已实现年度。金额常常是对的，纯数值比对抓不到。",
+     "causes": ("把半年报 / 季报的数字当作全年累计数",
+                "年份标注错位：写成下一年度，实际是上一年的数",
+                "把盈利预测值当成已实现业绩引用"),
+     "howto": ("核对句子里的时点与年报的资产负债表日是否一致",
+               "单季、半年度与全年累计不可直接比较",
+               "预测年度不是已实现业绩，只能与预测数据对照"),
+     "tip": "对不上年度就存疑：期间写错时金额常常是对的，纯数值比对抓不到。",
+     "term": "报告期：年报为 12 月 31 日，半年报为 6 月 30 日，一季报为 3 月 31 日。"},
+    {"cause": "VALUE_ERROR", "title": "数值错误",
+     "subtitle": "数字不符：引用的金额与年报原文对不上",
+     "example": "研报写 232 亿元，财报实为 222.75 亿元",
+     "definition": "研报引用的金额与年报同一科目、同一期间的数字不一致，包括抄错位数、"
+                   "四舍五入过度、把相近科目串用。",
+     "causes": ("手工录入抄错位数或小数点",
+                "四舍五入过度：222.75 亿元写成 232 亿元",
+                "科目串用：把「营业总收入」写成「营业收入」等相近科目"),
+     "howto": ("定位到年报同一科目、同一期间的原文数字",
+               "逐位比对，注意小数位与四舍五入规则",
+               "金额一致但口径不同（合并 / 母公司）时需另作判断"),
+     "tip": "和年报原文逐位比对：这是最直接的一类，逐位核对即可发现。",
+     "term": "合并口径：合并报表含子公司，母公司报表仅指母公司本身。"},
 )
 
 
@@ -170,32 +215,168 @@ def _rgba(hex_color: str, alpha: float) -> str:
     return f"rgba({r},{g},{b},{alpha})"
 
 
-def error_type_cards_html() -> str:
-    """「研报常见错误类型科普」四张卡片（自包含 HTML，含样式）。
+def error_type_summary(research: dict) -> list[dict]:
+    """四类错误的条数与占比汇总（条数取自 ``research_error_rows``，与对比图同源）。
 
-    ★ 卡片主色直接取 ``CAUSE_COLOR`` —— 与「研报纠错对比图」里同类错误的色块**同源**，
-      读者在图上看到红色就是数值错误、琥珀色就是单位量级错误，无需再看图例。
-    ★ 自包含：样式随片段一起下发，网页端 ``st.markdown`` 与 HTML 报告都能直接内嵌。
+    四类固定的归因始终列出（0 条也给出来，便于读者知道"这一类本次没出现"），
+    清单外的归因追加在后。占比分母 = 本次研报引用异常（FAIL）总条数。
     """
-    cards = []
-    for cause, title, example, tip in ERROR_TYPE_CARDS:
-        c = CAUSE_COLOR.get(cause, CAUSE_OTHER_COLOR)
-        cards.append(
-            f'<div class="fec-card" style="border-left:5px solid {c};'
-            f'background:{_tint(c)}">'
-            f'<div class="fec-head" style="color:{c}">{title}</div>'
-            f'<div class="fec-ex">{example}</div>'
-            f'<div class="fec-tip">{tip}</div></div>')
+    rows = research_error_rows(research)
+    total = len(rows)
+    counts: dict[str, int] = {}
+    for r in rows:
+        key = r.get("cause") or ""
+        counts[key] = counts.get(key, 0) + 1
+    known = [c["cause"] for c in ERROR_TYPE_CARDS]
+    causes = known + [c for c in counts if c not in known]
+    out = []
+    for c in causes:
+        n = counts.get(c, 0)
+        out.append({"cause": c, "cause_zh": CAUSE_ZH.get(c, c or "未归类"), "count": n,
+                    "pct": round(n * 100.0 / total, 1) if total else 0.0,
+                    "color": CAUSE_COLOR.get(c, CAUSE_OTHER_COLOR)})
+    return out
+
+
+_CARD_CSS = (
+    '<style>'
+    '.etc-wrap{display:flex;flex-direction:column;gap:14px;margin:6px 0 2px}'
+    '.etc-card{width:100%;border-radius:10px;padding:18px 20px;box-sizing:border-box}'
+    '.etc-title{font-size:19px;font-weight:700;margin:0 0 2px}'
+    '.etc-sub{font-size:13px;color:%MUTED%;margin:0 0 12px}'
+    '.etc-def{font-size:14px;line-height:1.8;color:%INK%;margin:0 0 12px}'
+    '.etc-sec{font-size:14px;font-weight:700;color:%INK%;margin:14px 0 6px}'
+    '.etc-li{font-size:13px;line-height:1.9;color:%INK%;margin:0 0 0 20px}'
+    '.etc-ex{font-family:Consolas,Menlo,monospace;font-size:14px;background:#FFFFFF;'
+    'border-radius:6px;padding:9px 12px;margin:2px 0 0;border-left:4px solid %C%}'
+    '.etc-term{font-size:12.5px;color:%MUTED%;line-height:1.8;margin:12px 0 0;'
+    'padding-top:10px;border-top:1px dashed %GRID%}'
+    '.etc-hit{font-family:Consolas,Menlo,monospace;font-size:12.5px;line-height:1.75;'
+    'margin:2px 0 0;color:%INK%}'
+    '</style>'
+)
+
+
+def _card_style(c: str) -> str:
+    """卡片样式：占位符替换（CSS 自带花括号，不能用 str.format）。"""
+    return (_CARD_CSS.replace("%MUTED%", PALETTE["muted"]).replace("%INK%", PALETTE["ink"])
+            .replace("%GRID%", PALETTE["grid"]).replace("%C%", c))
+
+
+def error_type_card_html(cause: str, hits: list[dict] | None = None) -> str:
+    """单类错误的**大卡片**（自包含 HTML）：定义 / 常见成因 / 怎么识别 / 本次实例 / 术语。
+
+    清单外的归因也能渲染（用兜底标题与一句说明），保证"识别出来的若干个"都能点开。
+    """
+    card = next((c for c in ERROR_TYPE_CARDS if c["cause"] == cause), None)
+    color = CAUSE_COLOR.get(cause, CAUSE_OTHER_COLOR)
+    if card is None:
+        card = {"title": CAUSE_ZH.get(cause, cause or "未归类"),
+                "subtitle": "清单外的归因，需人工确认",
+                "definition": "本次识别到的归因不在四类常见错误之内，需回到研报与财报原文人工确认。",
+                "causes": (), "howto": (), "example": "", "tip": "", "term": ""}
+    hits = hits or []
+    parts = [f'<div class="etc-card" style="border-left:5px solid {color};'
+             f'background:{_tint(color, 0.08)}">',
+             f'<div class="etc-title" style="color:{color}">{card["title"]}</div>',
+             f'<div class="etc-sub">{card["subtitle"]}｜本次命中 {len(hits)} 条</div>',
+             f'<div class="etc-def">{card["definition"]}</div>']
+    if card["causes"]:
+        parts.append('<div class="etc-sec">常见成因</div>')
+        parts += [f'<div class="etc-li">· {x}</div>' for x in card["causes"]]
+    if card["howto"]:
+        parts.append('<div class="etc-sec">怎么识别（三步）</div>')
+        parts += [f'<div class="etc-li">{i}. {x}</div>'
+                  for i, x in enumerate(card["howto"], 1)]
+    if card["example"]:
+        parts.append('<div class="etc-sec">典型例子</div>')
+        parts.append(f'<div class="etc-ex">{card["example"]}</div>')
+    if hits:
+        parts.append('<div class="etc-sec">本次运行命中</div>')
+        for h in hits:
+            parts.append(
+                f'<div class="etc-hit">· 研报写的 {h.get("written", "—")} → '
+                f'应为 {h.get("should", "—")}（{h.get("item", "—")} · '
+                f'{h.get("period", "—")}）</div>')
+    if card.get("term"):
+        parts.append(f'<div class="etc-term">{card["term"]}</div>')
+    parts.append('</div>')
+    return _card_style(color) + "".join(parts)
+
+
+def error_type_button_css(causes) -> str:
+    """把科普小卡片**渲染成按钮本身**：整张彩色卡片就是可点击区域。
+
+    Streamlit 会为带 ``key`` 的按钮生成 ``.st-key-<key>`` 容器类名，据此把按钮改造成与
+    对比图同色的卡片（顶部色条 + 同源淡底）；label 用 Markdown 硬换行（行尾两个空格）
+    分行，因此卡片里能同时放标题、条数、例子与一句话识别。
+    """
+    rules = []
+    for c in causes:
+        color = CAUSE_COLOR.get(c, CAUSE_OTHER_COLOR)
+        key = f".st-key-etc_{c}"
+        rules.append(
+            f"{key} button{{background:{_tint(color, 0.07)}!important;"
+            f"border:1px solid {_tint(color, 0.30)}!important;"
+            f"border-top:4px solid {color}!important;border-radius:8px!important;"
+            f"min-height:178px;width:100%;padding:14px 16px!important;"
+            f"text-align:left!important;justify-content:flex-start!important;"
+            f"align-items:flex-start!important;white-space:normal!important;"
+            f"height:auto!important;overflow:visible!important;box-shadow:none}}"
+            f"{key} button:hover{{background:{_tint(color, 0.15)}!important;"
+            f"border-color:{color}!important}}"
+            f"{key} button>div{{width:100%;overflow:visible!important;"
+            f"justify-content:flex-start!important}}"
+            f'{key} button [data-testid="stMarkdownContainer"]{{overflow:visible!important;'
+            f"white-space:normal!important}}"
+            f"{key} button p{{text-align:left!important;font-size:12.5px!important;"
+            f"line-height:1.7!important;color:{PALETTE['ink']}!important;margin:0!important;"
+            f"white-space:pre-line!important;overflow:visible!important;"
+            f"text-overflow:clip!important;display:block!important;"
+            f"-webkit-line-clamp:unset!important;max-height:none!important}}")
+    return "<style>" + "".join(rules) + "</style>"
+
+
+def error_type_hits_html(hits: list[dict]) -> str:
+    """弹窗内的「本次命中」明细表（自包含 HTML，横向可滚动）。
+
+    ★ 不用 ``st.dataframe``：只有 1 条时 Streamlit 会把列压到容器宽度内、右侧内容被裁掉
+      且不出现横向滚动条；这里用固定列宽的表格 + ``overflow-x:auto``，条数多少都能左右滑动。
+    """
+    import html as _html
+
+    cols = ("研报写的（研报原文值）", "应为（正确值）", "科目", "期间", "位置", "差异说明")
+    keys = ("written", "should", "item", "period", "location", "reason")
+    th = "".join(
+        f'<th style="white-space:nowrap;text-align:left;padding:7px 12px;'
+        f'background:{PALETTE["soft"]};color:{PALETTE["ink"]};font-weight:700;'
+        f'border-bottom:2px solid {PALETTE["accent"]};position:sticky;top:0">{c}</th>'
+        for c in cols)
+    body = []
+    for r in hits:
+        tds = "".join(
+            f'<td style="white-space:nowrap;padding:6px 12px;'
+            f'border-bottom:1px solid {PALETTE["grid"]};color:{PALETTE["ink"]}">'
+            f'{_html.escape(str(r.get(k) or "—"))}</td>' for k in keys)
+        body.append(f"<tr>{tds}</tr>")
     return (
-        '<style>'
-        '.fec-wrap{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 2px}'
-        '.fec-card{flex:1 1 240px;border-radius:8px;padding:10px 12px}'
-        '.fec-head{font-weight:700;font-size:14px;margin-bottom:5px}'
-        f'.fec-ex{{font-family:Consolas,Menlo,monospace;font-size:13px;'
-        f'color:{PALETTE["ink"]};margin-bottom:5px}}'
-        f'.fec-tip{{font-size:12px;color:{PALETTE["other"]};line-height:1.55}}'
-        '</style>'
-        '<div class="fec-wrap">' + "".join(cards) + '</div>')
+        '<div style="overflow-x:auto;border:1px solid '
+        f'{PALETTE["grid"]};border-radius:6px;margin-top:8px">'
+        '<table style="border-collapse:collapse;width:max-content;min-width:100%;'
+        f'font-size:12.5px"><thead><tr>{th}</tr></thead><tbody>'
+        + "".join(body) + "</tbody></table></div>")
+
+
+def error_type_cards_html(research: dict | None = None, causes=None) -> str:
+    """四类错误卡片**纵向排成一列**（HTML 报告用；网页端每类各自放进折叠项）。
+
+    ``research`` 给出时，每张卡片内嵌本次该类命中的实例；``causes`` 可只渲染指定归因。
+    """
+    wanted = list(causes) if causes else [c["cause"] for c in ERROR_TYPE_CARDS]
+    rows = research_error_rows(research or {})
+    cards = [error_type_card_html(c, [r for r in rows if r.get("cause") == c])
+             for c in wanted]
+    return '<div class="etc-wrap">' + "".join(cards) + "</div>"
 
 
 # ---------------- Plotly（网页端 / HTML 报告） ----------------
@@ -299,24 +480,29 @@ def research_error_compare(research: dict):
         return None
     go = _go()
     n = len(rows)
+    # ★ 配色与科普卡片一致，但**不把单元格涂深**：错误类型列取卡片同源淡底，
+    #   文字用该类主题色；内部两列（研报写的 / 应为）维持原有的异常淡红底与正确淡绿底。
+    row_colors = [CAUSE_COLOR.get(r["cause"], CAUSE_OTHER_COLOR) for r in rows]
     fills = [
-        [CAUSE_COLOR.get(r["cause"], CAUSE_OTHER_COLOR) for r in rows],  # 错误类型：色块即标签
-        [_tint(PALETTE["fail"], 0.08)] * n,                             # 研报写的：异常色淡底
-        [_tint("#1E7A46", 0.10)] * n,                                   # 应为：绿淡底
+        [_tint(c, 0.10) for c in row_colors],              # 错误类型：浅色卡片底
+        [_tint(PALETTE["fail"], 0.08)] * n,                # 研报写的：异常色淡底（原有）
+        [_tint(PALETTE["ok"], 0.10)] * n,                  # 应为：正确色淡底（原有）
         ["#FFFFFF"] * n,
     ]
     fig = go.Figure(go.Table(
         columnwidth=[96, 300, 260, 210],
         header=dict(values=["错误类型", "研报写的（研报原文值）", "应为（正确值）", "位置"],
-                    fill_color=PALETTE["accent"], align="left", height=30,
-                    font=dict(color="#FFFFFF", size=12)),
+                    fill_color=_tint(PALETTE["accent"], 0.12), align="left", height=30,
+                    font=dict(color=PALETTE["accent"], size=12)),
         cells=dict(values=[[r["cause_zh"] for r in rows],
                            [_short(r["written"]) for r in rows],
                            [_short(r["should"]) for r in rows],
                            [_short(r["location"], 40) for r in rows]],
                    fill_color=fills, align="left", height=30,
-                   font=dict(size=11, color=["#FFFFFF", PALETTE["ink"], "#1E7A46",
-                                             PALETTE["muted"]]))))
+                   font=dict(size=11))))
+    # 单元格文字逐行上色（Plotly 按列优先的扁平数组）：错误类型用主题色，其余恢复正文配色。
+    fig.data[0].cells.font.color = row_colors + [PALETTE["ink"]] * n + \
+                                   [PALETTE["ok"]] * n + [PALETTE["muted"]] * n
     fig.update_layout(
         **_LAYOUT,
         title=dict(text="研报纠错对比：研报写的 → 应为（正确值）", font=dict(size=14),

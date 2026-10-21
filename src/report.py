@@ -783,8 +783,8 @@ def render_pdf(model: dict, path: Path) -> Path:
         ]))
         return t
 
-    story = [Paragraph("FinCheck 财报一致性核查报告", h1),
-             Paragraph("——让普通投资者看得懂、查得清：把「研报写的」与「财报实际的」"
+    story = [Paragraph("FinCheck 财报核查智能教学平台 · 核查报告", h1),
+             Paragraph("——从专业课堂到大众科普的智能学习工具：把「研报写的」与「财报实际的」"
                        "逐条摆在一起核对，并教你识别研报常见错误", small),
              Paragraph(f"运行编号 {model['run_id']} ｜ 生成时间 {model['generated_at']}", small),
              Paragraph("面向投资者的财报与研报一致性核查：把「研报写的」与「财报实际的」"
@@ -913,6 +913,17 @@ def render_pdf(model: dict, path: Path) -> Path:
                              loc_str(r.get("evidence"))])
             story.append(tbl(rows, widths=[16 * mm, 14 * mm, 20 * mm, 22 * mm,
                                            12 * mm, 30 * mm, 26 * mm, 25 * mm]))
+            # 四类错误的条数/占比汇总：与网页端、对比图、HTML 报告同源（src.viz.error_type_summary）
+            try:
+                from src.viz import error_type_summary
+                _sum_rows = [["错误类型", "条数", "占比"]]
+                for x in error_type_summary(model.get("research") or {}):
+                    _sum_rows.append([x["cause_zh"], str(x["count"]), f"{x['pct']:.1f}%"])
+                story.append(Paragraph("研报引用异常按四类错误归类", h3))
+                story.append(tbl(_sum_rows, widths=[45 * mm, 25 * mm, 25 * mm]))
+                story.append(Spacer(1, 5))
+            except Exception:  # noqa: BLE001 - 汇总不可用不影响异常明细
+                pass
         if _rv_groups:
             _rv_n = sum(len(rows) for _zh, rows in _rv_groups)
             story.append(Paragraph(
@@ -1051,7 +1062,7 @@ def render_pdf(model: dict, path: Path) -> Path:
     SimpleDocTemplate(str(path), pagesize=A4,
                       leftMargin=18 * mm, rightMargin=18 * mm,
                       topMargin=16 * mm, bottomMargin=16 * mm,
-                      title=f"FinCheck 财报一致性核查报告 {model['run_id']}").build(story)
+                      title=f"FinCheck 财报核查智能教学平台 · 核查报告 {model['run_id']}").build(story)
     return path
 
 
@@ -1236,7 +1247,7 @@ def render_xlsx(model: dict, path: Path) -> Path:
 # ---------------- HTML ----------------
 
 _HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
-<title>FinCheck 财报一致性核查报告 {run_id}</title>
+<title>FinCheck 财报核查智能教学平台 · 核查报告 {run_id}</title>
 <style>
  body{{font-family:"Microsoft YaHei",system-ui,sans-serif;margin:0;background:#f7f8fa;color:#222}}
  .wrap{{max-width:1100px;margin:0 auto;padding:24px}}
@@ -1255,8 +1266,8 @@ _HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .viz{{background:#fff;border:1px solid #e3e6ea;border-radius:6px;padding:4px 8px;margin:10px 0}}
 </style>
 <div class="wrap">
-<h1>FinCheck 财报一致性核查报告</h1>
-<div class="meta sub">——让普通投资者看得懂、查得清：把「研报写的」与「财报实际的」逐条摆在一起核对，并教你识别研报常见错误</div>
+<h1>FinCheck 财报核查智能教学平台 · 核查报告</h1>
+<div class="meta sub">——从专业课堂到大众科普的智能学习工具：把「研报写的」与「财报实际的」逐条摆在一起核对，并教你识别研报常见错误</div>
 <div class="meta">运行编号 {run_id} ｜ 生成时间 {generated_at} ｜ 报告版本 {report_version}</div>
 <div class="meta">面向投资者的财报与研报一致性核查：把「研报写的」与「财报实际的」摆在一起逐条核对，并给出该项应为的正确写法。</div>
 <div class="warn">{disclaimer}</div>
@@ -1390,16 +1401,25 @@ def render_html(model: dict, path: Path) -> Path:
 
     # 「研报常见错误类型科普」：与网页端 expander、对比图同源同色（配色见 src/viz.PALETTE）。
     # ★ 这一节把作品从"核查工具"扩展为"核查 + 教学"：读者对照上图色块即可学会识别四类错误。
+    # ★ 卡片前先给四类错误的条数/占比汇总，使"分类"不止出现在逐条明细里。
     try:
-        from src.viz import error_type_cards_html
-        _cards = error_type_cards_html()
+        from src.viz import ERROR_TYPE_CARDS, error_type_cards_html, error_type_summary
+        _cards = error_type_cards_html(model.get("research") or {})
+        _et_sum = error_type_summary(model.get("research") or {})
     except Exception:  # noqa: BLE001
-        _cards = ""
+        _cards, _et_sum = "", []
     if _cards:
-        sections.append("<h2>研报常见错误类型科普</h2>"
-                        '<p class="meta">下面四类错误的配色与上方「研报纠错对比图」的'
-                        '"错误类型"列完全一致：图上看到什么颜色，卡片上就是同一类错误。</p>'
-                        + _cards)
+        sections.append("<h2>研报常见错误类型科普</h2>")
+        if _et_sum and any(x["count"] for x in _et_sum):
+            sections.append("<h3>本次四类错误的条数与占比</h3>" + _table(
+                ["错误类型", "条数", "占比", "一句话识别"],
+                [[x["cause_zh"], x["count"], f"{x['pct']:.1f}%",
+                  next((c["tip"] for c in ERROR_TYPE_CARDS if c["cause"] == x["cause"]),
+                       "清单外的归因，需人工确认")]
+                 for x in _et_sum]))
+        sections.append('<p class="meta">下面按错误类型逐条列出（与上方「研报纠错对比图」的'
+                        '"错误类型"列同色同源）：每张卡片给出定义、常见成因、识别三步、'
+                        '典型例子与本次命中的具体实例。</p>' + _cards)
 
     # 模型语义审计提示（RC06）：与"异常"分开呈现，性质是提示而非判定
     _au_rows = audit_rows(model)

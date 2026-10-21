@@ -44,8 +44,20 @@ def list_runs() -> list[str]:
     return sorted((p.name for p in d.iterdir() if p.is_dir()), reverse=True)
 
 
-st.title("FinCheck · 财报一致性核查智能体")
-st.markdown("##### 让普通投资者看得懂、查得清：逐条核对研报与财报，并教你识别研报常见错误")
+@st.dialog("研报常见错误 · 识别方法", width="large")
+def _error_type_dialog(cause: str, hits: list[dict]) -> None:
+    """点击科普小卡片后弹出的 modal：背景自动虚化/压暗，卡片以弹窗形式放大展示。"""
+    from src.viz import error_type_card_html, error_type_hits_html
+    st.markdown(error_type_card_html(cause, hits), unsafe_allow_html=True)
+    if hits:
+        # 明细表用自包含 HTML：1 条与多条都能横向滑动，不出现右侧内容被裁掉的情况。
+        st.markdown(error_type_hits_html(hits), unsafe_allow_html=True)
+    else:
+        st.caption("本次运行未命中该类错误，以上为识别要点。")
+
+
+st.title("FinCheck · 财报核查智能教学平台")
+st.markdown("##### ——从专业课堂到大众科普的智能学习工具")
 st.caption("把研报与财报摆在一起逐条对：程序按确定性规则核对表内勾稽、跨期衔接与研报引用，"
           "指出「研报写的」与「财报实际的」差在哪里、该项应为的正确写法；"
           "并教你识别研报常见的四类错误（正负号、单位量级、期间、数值）。")
@@ -321,10 +333,33 @@ with tab2:
         st.caption("「研报写的」= 研报原文值；「应为（正确值）」= 系统核出的正确写法"
                    "（无确定性结论时为「—」）。过长原文已截断，完整原文与证据定位见①异常清单。")
 
-    # 「研报常见错误类型科普」：卡片配色与上方对比图的「错误类型」列同源（见 src.viz.PALETTE）。
+    # 「研报常见错误类型科普」：配色与上方对比图的「错误类型」列同源（见 src.viz.PALETTE）。
     # ★ 这一块把作品从"核查工具"扩展为"核查 + 教学"，直接点题智慧教育。
-    with st.expander("教你识别研报常见错误（四类错误的识别要点）", expanded=False):
-        st.markdown(error_type_cards_html(), unsafe_allow_html=True)
+    # ★ 表面并排放四张彩色卡片，**卡片本身即按钮**（无「查看详情」按钮）；点击后弹出 modal，
+    #   背景压暗，大卡片在弹窗中展开：定义 / 常见成因 / 怎么识别 / 典型例子 / 本次命中实例 / 术语。
+    from src.viz import (ERROR_TYPE_CARDS, error_type_button_css, error_type_summary,
+                         research_error_rows)
+    _et_sum = error_type_summary(research)
+    _et_rows = research_error_rows(research)
+    st.markdown("##### 教你识别研报常见错误")
+    st.caption("点击任意一张彩色卡片，弹窗查看该类的识别方法、常见成因与本次命中的具体实例。")
+    st.markdown(error_type_button_css([x["cause"] for x in _et_sum]), unsafe_allow_html=True)
+    _card_by_cause = {c["cause"]: c for c in ERROR_TYPE_CARDS}
+    for _start in range(0, len(_et_sum), 4):
+        _group = _et_sum[_start:_start + 4]
+        for _col, _et in zip(st.columns(4, gap="medium"), _group):
+            _mini = _card_by_cause.get(_et["cause"], {})
+            # 行尾两个空格 = Markdown 硬换行；Streamlit 按钮 label 支持 Markdown。
+            _label = (f"**{_mini.get('title', _et['cause_zh'])}**　本次 {_et['count']} 条"
+                      f" · 占比 {_et['pct']:.0f}%  \n{_mini.get('example', '')}  "
+                      f"\n{_mini.get('tip', '需人工确认。')}")
+            with _col:
+                if st.button(_label, key=f"etc_{_et['cause']}", width='stretch'):
+                    st.session_state["_etc_open"] = _et["cause"]
+    # 弹窗在整段卡片之后、脚本顶层调用（不嵌在列里），确保 modal 能正确覆盖整页。
+    if st.session_state.get("_etc_open"):
+        _cause = st.session_state.pop("_etc_open")
+        _error_type_dialog(_cause, [r for r in _et_rows if r["cause"] == _cause])
 
     st.divider()
     if not dims:

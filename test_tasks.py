@@ -1918,7 +1918,7 @@ def test_web_app_renders_without_exception():
     _make_run_fixture("pytest_web")
     at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=90).run()
     assert not at.exception, [str(e.value) for e in at.exception]
-    assert [t.value for t in at.title] == ["FinCheck · 财报一致性核查智能体"]
+    assert [t.value for t in at.title] == ["FinCheck · 财报核查智能教学平台"]
 
     labels = [m.label for m in at.metric]
     # CSI 指标卡在口径未裁定（provisional）时会带上「（临时）」后缀，故按前缀匹配
